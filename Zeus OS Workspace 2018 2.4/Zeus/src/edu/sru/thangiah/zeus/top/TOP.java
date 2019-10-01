@@ -6,7 +6,14 @@ import edu.sru.thangiah.zeus.top.topgui.*;
 import edu.sru.thangiah.zeus.top.topqualityassurance.*;
 import edu.sru.thangiah.zeus.core.*;
 import edu.sru.thangiah.zeus.localopts.*;
+import edu.sru.thangiah.zeus.localopts.interopts.FirstFirstInterSearch;
 import edu.sru.thangiah.zeus.localopts.intraopts.*;
+import edu.sru.thangiah.zeus.top.*;
+import edu.sru.thangiah.zeus.top.TOPProblemInfo.TOPCostType;
+import edu.sru.thangiah.zeus.localopts.interopts.*;
+
+
+
 //import edu.sru.thangiah.zeus.localopts.*;
 
 /**
@@ -65,10 +72,13 @@ public class TOP {
     else {
       //If optimizations are enabled, create a list of them to be run
       if (TOPProblemInfo.enableOptimizations == true) {
-        mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPProblemInfo.TOPCostType.SCORE_INVERSE));
+        //mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPProblemInfo.TOPCostType.SCORE_INVERSE));
+        mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPCostType.SCORE_INVERSE));
+
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
+        //mainOpts.add(new TOPOptEntry(new TOPReduction(), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new TOPReduction(), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new OneOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));

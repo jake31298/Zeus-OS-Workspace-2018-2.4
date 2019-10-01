@@ -352,4 +352,29 @@ public class TOPDepotLLCostFunctions extends TOPAbstractCostFunctions implements
     setAvgTravelTime(o);
     setTotalCost(o);
   }
+
+  //Added 1 OCT 2019
+@Override
+public int getTotalDays(Object arg0) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+@Override
+public int getTotalStops(Object arg0) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+@Override
+public void setTotalDays(Object arg0) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void setTotalStops(Object arg0) {
+	// TODO Auto-generated method stub
+	
+}
 }

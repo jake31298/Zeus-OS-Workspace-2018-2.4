@@ -1,8 +1,8 @@
-package edu.sru.thangiah.opsys.top.topgui;
+package edu.sru.thangiah.zeus.top.topgui;
 
 import javax.swing.*;
 import java.awt.*;
-import edu.sru.thangiah.opsys.top.*;
+import edu.sru.thangiah.zeus.top.*;
 
 public class TOPGuiInfo {
   public static JDesktopPane mainDesktop; // The instance of the mainDesktop

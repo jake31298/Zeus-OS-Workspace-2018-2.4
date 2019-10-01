@@ -5,6 +5,7 @@ import edu.sru.thangiah.zeus.top.*;
 import edu.sru.thangiah.zeus.qualityassurance.*;
 import edu.sru.thangiah.zeus.top.TOPDepotLinkedList;
 import edu.sru.thangiah.zeus.top.TOPShipmentLinkedList;
+//import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
 
 import java.io.*;
 import java.util.*;
@@ -91,12 +92,14 @@ public class TOPQualityAssurance
     PrintStream out = null;
     try {
       //write the shipment information - C:/temp/ship.txt
-      shipFile = new File(ProblemInfo.tempFileLocation + "/ship.txt");
+      //shipFile = new File(ProblemInfo.tempFileLocation + "/ship.txt"); // Original
+      shipFile = new File(ZeusProblemInfo.getTempFileLocation() + "/ship.txt");
       out = new PrintStream(new FileOutputStream(shipFile));
       mainShipments.writeShipments(out);
 
       //write the current solution - C:/temp/sol.txt
-      solFile = new File(ProblemInfo.tempFileLocation + "/sol.txt");
+      //solFile = new File(ProblemInfo.tempFileLocation + "/sol.txt"); // Original
+      solFile = new File(ZeusProblemInfo.getTempFileLocation() + "/sol.txt");
       out = new PrintStream(new FileOutputStream(solFile));
       mainDepots.printDepotLinkedList(out);
     }
