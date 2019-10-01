@@ -10,11 +10,7 @@ TOPOptEntry has functions that need to be setup
 Errors in:
 	edu.sru.thangiah.zeus.top
 		TOP.JAVA
-		TOPNodes.java
-		TOPNodesLinkedList.java
-		TOPOptEntry.java
 	edu.sru.thangiah.zeus.top.topcostfunctions
-		TOPDepotCostFunctions.java
 		TOPDepotLLCostFunctions.java
 		TOPNodesLLCostFunctions.java
 		TOPTruckCostFunctions.java
