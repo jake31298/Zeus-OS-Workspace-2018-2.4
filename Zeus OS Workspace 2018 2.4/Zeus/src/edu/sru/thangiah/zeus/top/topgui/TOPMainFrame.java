@@ -5,6 +5,7 @@ import edu.sru.thangiah.zeus.core.*;
 import edu.sru.thangiah.zeus.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -221,7 +222,8 @@ public class TOPMainFrame
       Truck tempTruck = tempDepot.getMainTrucks().getHead();
 
       while (tempTruck != null) {
-        if (!tempTruck.isEmpty()) {
+        //if (!tempTruck.isEmpty()) { // Original
+    	  if (!((List) tempTruck).isEmpty()) { // Added 1 OCT 2019
           DefaultMutableTreeNode tempTNode = new DefaultMutableTreeNode(
               tempTruck.toString());
           Nodes point = tempTruck.getMainNodes().getHead();

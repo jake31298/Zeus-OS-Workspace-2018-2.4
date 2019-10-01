@@ -41,7 +41,9 @@ public class TOPTruckLLCostFunctions
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
     setTotalTravelTime(o);
 
-    return truckLL.attributes.totalTravelTime;
+    //return truckLL.attributes.totalTravelTime;
+    return truckLL.getAttributes().getTotalTravelTime();
+
   }
 
   public double getMaxTravelTime(Object o) {
@@ -60,14 +62,19 @@ public class TOPTruckLLCostFunctions
 
   public void setTotalCost(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    truckLL.getAttributes().totalCost = 0;
+    //truckLL.getAttributes().totalCost = 0;
+    truckLL.getAttributes().setTotalCost(0);
+
 
     Truck t = truckLL.getHead();
 
     while (t != null) {
-      if (!t.isEmpty()) {
-        truckLL.getAttributes().totalCost += ProblemInfo.truckLevelCostF.
-            getTotalCost(t);
+      //if (!t.isEmpty()) { // Original
+      if (!((TOPTruck) t).isEmpty()) {
+  
+        //truckLL.getAttributes().totalCost += ProblemInfo.truckLevelCostF.
+        truckLL.getAttributes().setTotalCost((ZeusProblemInfo.getTruckLevelCostF().getTotalCost(t)) 
+        		+ truckLL.getAttributes().getTotalCost());
       }
 
       t = t.getNext();
@@ -76,7 +83,8 @@ public class TOPTruckLLCostFunctions
 
   public void setTotalDemand(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    truckLL.getAttributes().totalDemand = 0;
+    //truckLL.getAttributes().totalDemand = 0;
+    truckLL.getAttributes().setTotalDemand(0);
 
     TOPTruck t = (TOPTruck) truckLL.getHead();
     TOPTruck temp = t;
@@ -84,7 +92,10 @@ public class TOPTruckLLCostFunctions
     while (t != null) {
       if (!t.isEmpty())
       {
-        truckLL.getAttributes().totalDemand += ProblemInfo.truckLevelCostF.getTotalDemand(t);
+        //truckLL.getAttributes().totalDemand += ProblemInfo.truckLevelCostF.getTotalDemand(t);
+        truckLL.getAttributes().setTotalDemand((ZeusProblemInfo.getTruckLevelCostF().getTotalDemand(t)) 
+        		+ truckLL.getAttributes().getTotalDemand());
+
       }
 
       t = (TOPTruck) t.getNext();
@@ -96,13 +107,20 @@ public class TOPTruckLLCostFunctions
 
   public void setTotalDistance(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    truckLL.getAttributes().totalDistance = 0;
+    //truckLL.getAttributes().totalDistance = 0;
+    truckLL.getAttributes().setTotalDistance(0);
+
 
     Truck t = truckLL.getHead();
 
     while (t != null) {
-      if (!t.isEmpty()) {
-        truckLL.getAttributes().totalDistance += ProblemInfo.truckLevelCostF.getTotalDistance(t);
+      //if (!t.isEmpty()) {
+      if (!((TOPTruck) t).isEmpty()) {
+
+        //truckLL.getAttributes().totalDistance += ProblemInfo.truckLevelCostF.getTotalDistance(t);
+        truckLL.getAttributes().setTotalDistance((ZeusProblemInfo.getTruckLevelCostF().getTotalDistance(t)) 
+        		+ truckLL.getAttributes().getTotalDistance());
+
       }
 
       t = t.getNext();
@@ -111,14 +129,20 @@ public class TOPTruckLLCostFunctions
 
   public void setTotalTravelTime(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    truckLL.getAttributes().totalTravelTime = 0;
+    //truckLL.getAttributes().totalTravelTime = 0;
+    truckLL.getAttributes().setTotalTravelTime(0);
+
 
     Truck t = truckLL.getHead();
 
     while (t != null) {
-      if (!t.isEmpty()) {
-        truckLL.getAttributes().totalTravelTime += ProblemInfo.truckLevelCostF.
-            getTotalTravelTime(t);
+      //if (!t.isEmpty()) {
+      if (!((TOPTruck) t).isEmpty()) {
+
+        //truckLL.getAttributes().totalTravelTime += ProblemInfo.truckLevelCostF.getTotalTravelTime(t);
+        truckLL.getAttributes().setTotalTravelTime((ZeusProblemInfo.getTruckLevelCostF().getTotalTravelTime(t)) 
+        		+ truckLL.getAttributes().getTotalTravelTime());
+
       }
 
       t = t.getNext();
@@ -131,16 +155,24 @@ public class TOPTruckLLCostFunctions
     Truck t = truckLL.getHead();
 
     while (t != null) {
-      if (!t.isEmpty()) {
-        if (ProblemInfo.truckLevelCostF.getMaxTravelTime(t) > max) {
-          max = ProblemInfo.truckLevelCostF.getMaxTravelTime(t);
+      //if (!t.isEmpty()) {
+      if (!((TOPTruck) t).isEmpty()) {
+
+        //if (ProblemInfo.truckLevelCostF.getMaxTravelTime(t) > max) {
+        if (ZeusProblemInfo.getTruckLevelCostF().getMaxTravelTime(t) > max) {
+
+          //max = ProblemInfo.truckLevelCostF.getMaxTravelTime(t);
+          max = ZeusProblemInfo.getTruckLevelCostF().getMaxTravelTime(t);
+
         }
       }
 
       t = t.getNext();
     }
 
-    truckLL.getAttributes().maxTravelTime = max;
+    //truckLL.getAttributes().maxTravelTime = max;
+    truckLL.getAttributes().setMaxTravelTime(max);
+
   }
 
   public void setAvgTravelTime(Object o) {
@@ -149,20 +181,31 @@ public class TOPTruckLLCostFunctions
     Truck t = truckLL.getHead();
 
     if ( (truckLL.getSize() != 0) &&
-        (ProblemInfo.truckLLLevelCostF.getTotalDemand(truckLL) != 0)) {
+        //(ProblemInfo.truckLLLevelCostF.getTotalDemand(truckLL) != 0)) {
+        (ZeusProblemInfo.getTruckLLLevelCostF().getTotalDemand(truckLL) != 0)) {
+
       while (t != null) {
-        if (!t.isEmpty()) {
+        //if (!t.isEmpty()) {
+        if (!((TOPTruck) t).isEmpty()) {
+
           avg +=
-              (ProblemInfo.truckLevelCostF.getAvgTravelTime(t) * ProblemInfo.truckLevelCostF.getTotalDemand(t));
+              //(ProblemInfo.truckLevelCostF.getAvgTravelTime(t) * ProblemInfo.truckLevelCostF.getTotalDemand(t));
+              (ZeusProblemInfo.getTruckLevelCostF().getAvgTravelTime(t) 
+            		  * ZeusProblemInfo.getTruckLevelCostF().getTotalDemand(t));
+
         }
 
         t = t.getNext();
       }
 
-      truckLL.getAttributes().avgTravelTime = avg / ProblemInfo.truckLLLevelCostF.getTotalDemand(truckLL);
+      //truckLL.getAttributes().avgTravelTime = avg / ProblemInfo.truckLLLevelCostF.getTotalDemand(truckLL);
+      truckLL.getAttributes().setAvgTravelTime(avg / (ZeusProblemInfo.getTruckLLLevelCostF().getTotalDemand(truckLL)));
+
     }
     else {
-      truckLL.getAttributes().avgTravelTime = 0;
+      //truckLL.getAttributes().avgTravelTime = 0;
+      truckLL.getAttributes().setAvgTravelTime(0);
+
     }
   }
 
@@ -174,4 +217,29 @@ public class TOPTruckLLCostFunctions
     setAvgTravelTime(o);
     setTotalCost(o);
   }
+
+// Added 1 OCT 2019
+@Override
+public int getTotalDays(Object arg0) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+@Override
+public int getTotalStops(Object arg0) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+@Override
+public void setTotalDays(Object arg0) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void setTotalStops(Object arg0) {
+	// TODO Auto-generated method stub
+	
+}
 }

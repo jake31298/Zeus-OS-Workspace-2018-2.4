@@ -20,8 +20,8 @@ public class TOPQADepotLinkedList
 
   public boolean checkDistanceConstraint() {
     boolean status = true;
-    for (int i = 0; i < depots.size(); i++) {
-      TOPQADepot depot = (TOPQADepot) depots.elementAt(i);
+    for (int i = 0; i < getDepots().size(); i++) {
+      TOPQADepot depot = (TOPQADepot) getDepots().elementAt(i);
       status = status && depot.checkDistanceConstraint();
     }
     return status;
@@ -29,8 +29,8 @@ public class TOPQADepotLinkedList
 
   public boolean checkCapacityConstraint() {
    boolean status = true;
-   for (int i = 0; i < depots.size(); i++) {
-     TOPQADepot depot = (TOPQADepot) depots.elementAt(i);
+   for (int i = 0; i < getDepots().size(); i++) {
+     TOPQADepot depot = (TOPQADepot) getDepots().elementAt(i);
      status = status && depot.checkCapacityConstraint();
    }
    return status;

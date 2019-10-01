@@ -5,6 +5,8 @@ import edu.sru.thangiah.zeus.localopts.interopts.FirstFirstInterSearch;
 import edu.sru.thangiah.zeus.top.TOPProblemInfo.TOPCostType;
 
 
+
+
 public class TOPOptEntry {
   public static final long serialVersionUID = 1;
   private SearchStrategy opt;
@@ -17,11 +19,17 @@ public class TOPOptEntry {
   }
   
   
+  
   public TOPOptEntry(FirstFirstInterSearch firstFirstInterSearch, TOPCostType c) {
 	  opt = firstFirstInterSearch;
 	  costType = c;
   }
 
+
+
+public TOPOptEntry(Object firstFirstInterSearch, TOPProblemInfo.TOPCostType scoreInverse) {
+	// TODO Auto-generated constructor stub
+}
 
 
 public OptInfo run(TOPDepotLinkedList mainDepots) {

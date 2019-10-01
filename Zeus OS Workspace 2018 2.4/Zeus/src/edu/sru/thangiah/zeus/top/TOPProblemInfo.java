@@ -2,6 +2,7 @@ package edu.sru.thangiah.zeus.top;
 
 import java.util.Vector;
 import edu.sru.thangiah.zeus.top.topcostfunctions.*;
+import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
 //import edu.sru.thangiah.zeus.core.ProblemInfo;
 
 
@@ -9,7 +10,7 @@ import edu.sru.thangiah.zeus.top.topcostfunctions.*;
  * Holds global information about a TOP problem
  * @author Peter Schallot
  */
-public class TOPProblemInfo// extends ProblemInfo 
+public class TOPProblemInfo // extends ProblemInfo 
 {
   /**
    * Select the type of cost function to be used in TOPNodesLLCostFuntions.
