@@ -1,0 +1,11 @@
+[PropertyInfo]
+coolingSchedule,CoolingSchedule,false,false, , ,false,<default>
+finalTemperature,double,false,false, , ,false,<default>
+initTemperature,double,false,false, , ,false,<default>
+iterationsPerTemp,int,false,false, , ,false,<default>
+maxIterations,int,false,false, , ,false,<default>
+[IconNames]
+
+
+
+

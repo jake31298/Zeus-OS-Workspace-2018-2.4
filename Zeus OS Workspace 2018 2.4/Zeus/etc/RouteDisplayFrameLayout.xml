@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!DOCTYPE constraint-set
+    PUBLIC "-//Brunch Boy Design//RelativeLayout Constraint Set DTD 1.0//EN"
+    "http://dtd.brunchboy.com/RelativeLayout/constraint-set.dtd">
+
+<constraint-set>
+        <constrain name="routeDisplay">
+          <top>
+            <toAttribute reference="_container" attribute="top" offset="3" />
+          </top>
+          <bottom>
+            <toAttribute reference="_container" attribute="bottom" offset="-20" />
+          </bottom>
+          <left>
+            <toAttribute reference="_container" attribute="left" offset="3" />
+          </left>
+          <right>
+            <toAttribute reference="_container" attribute="right" offset="-3" />
+          </right>
+        </constrain>
+        <constrain name="xyPosLabel">
+          <bottom>
+            <toAttribute reference="_container" attribute="bottom" offset="-3" />
+          </bottom>
+          <right>
+            <toAttribute reference="_container" attribute="right" offset="-3" />
+          </right>
+        </constrain>
+        <constrain name="JW">
+        <top>
+          <toAttribute reference="_container" attribute="top" offset="0" />
+        </top>
+        <left>
+          <toAttribute reference="_container" attribute="left" offset="0" />
+        </left>
+        </constrain>
+
+</constraint-set>

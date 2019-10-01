@@ -1,0 +1,9 @@
+[PropertyInfo]
+loopUntilNoChanges,boolean,false,false, , ,true,<default>
+optimization,Optimization,false,false, , ,false,<default>
+shortName,String,false,false, , ,true,<default>
+[IconNames]
+
+
+
+

@@ -1,0 +1,124 @@
+TOP File         : H:\Zeus\ZeusJune2005\data\top\problems\PROB1-4-r.prn
+No. of members   : 4
+No. of Shipments : 32
+Total teams score : 270.0
+Total teams distance : 208.6322021484375
+Number of trucks : 11
+
+Truck number: 0  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 20.85719108581543  
+   Truck score     : 40.0  
+ Nodes: 7  
+   0  10.5  14.4  0.0  
+   28  8.9  13.6  10.0  
+   6  14.9  13.2  5.0  
+   7  16.3  13.3  5.0  
+   3  18.3  13.3  10.0  
+   2  18.0  15.9  10.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 1  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 21.198476791381836  
+   Truck score     : 50.0  
+ Nodes: 7  
+   0  10.5  14.4  0.0  
+   27  8.7  17.7  10.0  
+   31  7.3  18.8  10.0  
+   26  8.2  19.9  15.0  
+   22  10.2  22.1  10.0  
+   13  14.3  15.3  5.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 2  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 21.115516662597656  
+   Truck score     : 45.0  
+ Nodes: 7  
+   0  10.5  14.4  0.0  
+   12  13.2  20.1  10.0  
+   21  11.7  20.3  10.0  
+   11  15.7  20.6  10.0  
+   10  16.1  19.6  10.0  
+   8  16.4  17.8  5.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 3  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 20.909713745117188  
+   Truck score     : 25.0  
+ Nodes: 6  
+   0  10.5  14.4  0.0  
+   18  11.4  12.0  5.0  
+   5  15.4  11.0  10.0  
+   9  15.0  17.9  5.0  
+   19  11.2  17.6  5.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 4  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 19.24951934814453  
+   Truck score     : 15.0  
+ Nodes: 4  
+   0  10.5  14.4  0.0  
+   20  10.1  18.7  5.0  
+   23  9.7  23.8  10.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 5  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 20.69235610961914  
+   Truck score     : 15.0  
+ Nodes: 3  
+   0  10.5  14.4  0.0  
+   25  7.4  24.0  15.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 6  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 15.104236602783203  
+   Truck score     : 10.0  
+ Nodes: 3  
+   0  10.5  14.4  0.0  
+   30  4.9  18.9  10.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 7  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 14.278858184814453  
+   Truck score     : 20.0  
+ Nodes: 4  
+   0  10.5  14.4  0.0  
+   17  7.9  9.8  10.0  
+   29  5.6  11.1  10.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 8  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 20.838869094848633  
+   Truck score     : 30.0  
+ Nodes: 4  
+   0  10.5  14.4  0.0  
+   15  11.4  6.7  15.0  
+   16  8.3  5.0  15.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 9  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 19.36229705810547  
+   Truck score     : 10.0  
+ Nodes: 3  
+   0  10.5  14.4  0.0  
+   14  14.0  5.1  10.0  
+   -1  11.2  14.1  0.0  
+
+Truck number: 10  
+   Max Duration    : 21.200000762939453  
+   Current Duration: 15.025167465209961  
+   Truck score     : 10.0  
+ Nodes: 3  
+   0  10.5  14.4  0.0  
+   4  16.5  9.3  10.0  
+   -1  11.2  14.1  0.0  
+

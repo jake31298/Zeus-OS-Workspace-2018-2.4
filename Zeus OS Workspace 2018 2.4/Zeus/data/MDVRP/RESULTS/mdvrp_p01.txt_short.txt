@@ -1,0 +1,26 @@
+File: mdvrp_p01.txt Num Depots: 4 Num Pick Up Points: 50 Num Trucks: 4Processing Time: 0.641 seconds
+Total Demand = 0.00| Total Distance = 468.33| Total Travel Time = 273.19| Total Cost = $468.33|
+
+Depot Number 1
+Truck Number 0	Max Capacity: 80.0	Demand: 0.0	ROUTE:0 37 5 38 11 16 50 21 34 30 10 39 33 45 15 44 4 -1 
+		Max Distance: 1.0E9	Distance: 150.29417419433594
+
+
+Depot Number 2
+Truck Number 1	Max Capacity: 80.0	Demand: 0.0	ROUTE:0 46 12 17 42 19 40 41 13 25 14 18 47 -1 
+		Max Distance: 1.0E9	Distance: 121.51293182373047
+
+
+Depot Number 3
+Truck Number 2	Max Capacity: 80.0	Demand: 0.0	ROUTE:0 9 49 -1 
+		Max Distance: 1.0E9	Distance: 12.837102890014648
+
+
+Depot Number 4
+Truck Number 3	Max Capacity: 80.0	Demand: 0.0	ROUTE:0 29 2 22 1 32 27 48 6 23 24 43 7 26 8 31 28 3 36 35 20 -1 
+		Max Distance: 1.0E9	Distance: 183.6890869140625
+
+
+Inital Solution 0 changes  totQ=0.00 totD=844.01 $844.01
+TS: 89 changes  totQ=0.00 totD=468.33 $468.33
+     Best solution found at iteration: 14
