@@ -2,6 +2,7 @@ package edu.sru.thangiah.zeus.top;
 
 //import the parent class
 import edu.sru.thangiah.zeus.core.Nodes;
+import edu.sru.thangiah.zeus.core.Shipment;
 
 /**
  *
@@ -61,7 +62,8 @@ public class TOPNodes
   public Object clone() {
     TOPNodes clonedNode = new TOPNodes();
 
-    clonedNode.theShipment = (TOPShipment)this.getTOPShipment().clone();
+    //clonedNode.theShipment = (TOPShipment)this.getTOPShipment().clone(); Original
+    clonedNode.setShipment((TOPShipment) this.getTOPShipment().clone()); //Added 30 SEP 2019
     clonedNode.setNext(this.getTOPNext());
     clonedNode.setPrev(this.getTOPPrev());
 

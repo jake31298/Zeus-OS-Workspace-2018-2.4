@@ -56,7 +56,13 @@ public class TOPNodesLinkedList
 			    int tN) {
     setTruckType(tT);
     setTruckNum(tN);
-    setFeasibility(new TOPFeasibility(truckType.getMaxDuration(), getTruckType().getMaxCapacity(), this));
+    
+    // Original
+    //setFeasibility(new TOPFeasibility(truckType.getMaxDuration(), getTruckType().getMaxCapacity(), this));
+    // Potential Fix
+    setFeasibility(new TOPFeasibility(getTruckType().getMaxDuration(), getTruckType().getMaxCapacity(), this));
+    
+    
     setHead(new TOPNodes(new TOPShipment(0, depotX, depotY, 0, 0, "D", "D")));
     setTail(new TOPNodes(new TOPShipment( -1, endDepotX, endDepotY, 0, 0, "D", "D")));
     getHead().setNext(getTail());
