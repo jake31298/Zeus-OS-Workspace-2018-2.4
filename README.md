@@ -10,16 +10,4 @@ TOPOptEntry has functions that need to be setup
 Errors in:
 	edu.sru.thangiah.zeus.top
 		TOP.JAVA
-	edu.sru.thangiah.zeus.top.topcostfunctions
-		TOPDepotLLCostFunctions.java
-		TOPNodesLLCostFunctions.java
-		TOPTruckCostFunctions.java
-		TOPTruckLLCostFunctions.java
-	edu.sru.thangiah.zeus.top.topgui
-		TOPGui.java
-		TOPGuiInfo.java
-		TOPMainFrame.java
-		TOPRouteDisplayFrame.java
-	edu.sru.thangiah.zeus.top.topqualityassurance
-		TOPQualityAssurance.java
 
