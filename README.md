@@ -1,13 +1,11 @@
-# Zeus-OS-Workspace-2018-2.4
-
-Fixed old code mostly
-  Added setters and getters
-  Still fixing missing functions
-  
-TOPProblemInfo has variables that need to be understood  
+# Zeus-OS-Workspace-2018-2.4  
+TOPProblemInfo has variables that need to be understood
 TOPOptEntry has functions that need to be setup
 
-Errors in:
+Errors:
 	edu.sru.thangiah.zeus.top
 		TOP.JAVA
 
+TODO:
+	Read Excel files
+	Fix errors
