@@ -2,6 +2,11 @@ package edu.sru.thangiah.zeus.top;
 
 import java.io.*;
 import java.util.*;
+
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import edu.sru.thangiah.zeus.top.topgui.*;
 import edu.sru.thangiah.zeus.top.topqualityassurance.*;
 import edu.sru.thangiah.zeus.core.*;
@@ -571,5 +576,349 @@ public class TOP {
   public void displayGUI() {
     TOPGui guiPost = new TOPGui(mainDepots, mainShipments);
   }
+  
+  ///EXECL FILE STUFF
+  /*
+   * public void writeDataFile(String file) {
+		try {
+			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()+file +"_students.txt"));
+			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo1.
+			//		outputPath +file +"_students.txt"));
+			mainShipments.writeVRPShipments(ps);
+		}
+		catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+	
+	public void writeShortSolutionExcel(String file) 
+	{
+		
+		//setup excel file
+		int rowCounter = 0;
+		XSSFWorkbook workbook = new XSSFWorkbook(); // create a book
+		XSSFSheet sheet = workbook.createSheet("Sheet1");// create a sheet
+		XSSFRow curRow = sheet.createRow(rowCounter); // create a row
+		
+		//Problem info
+		curRow.createCell(0).setCellValue("File: ");
+		curRow.createCell(1).setCellValue(file);
+		curRow.createCell(2).setCellValue("Num Depots: ");
+		curRow.createCell(3).setCellValue(ZeusProblemInfo.getNumDepots());
+		//curRow.createCell(3).setCellValue(ProblemInfo1.numDepots);
+		curRow.createCell(4).setCellValue("Num Pick Up Points: ");
+		curRow.createCell(5).setCellValue(ZeusProblemInfo.getNumCustomers());
+		//curRow.createCell(5).setCellValue(ProblemInfo1.numCustomers);
+		curRow.createCell(6).setCellValue("Num Trucks: ");
+		curRow.createCell(7).setCellValue(ZeusProblemInfo.getNumTrucks());
+		//curRow.createCell(7).setCellValue(ProblemInfo1.numTrucks);
+		curRow.createCell(8).setCellValue("Processing Time: ");
+		curRow.createCell(9).setCellValue((endTime - startTime) / 1000);
+		curRow.createCell(10).setCellValue("seconds");
+		
+		//next row
+		rowCounter++;
+		curRow = sheet.createRow(rowCounter);
+		
+		
+		curRow.createCell(0).setCellValue("Total Demand =");
+		curRow.createCell(1).setCellValue(mainDepots.getAttributes().getTotalDemand());
+		curRow.createCell(2).setCellValue("Total Distance =");
+		curRow.createCell(3).setCellValue(mainDepots.getAttributes().getTotalDistance());
+		curRow.createCell(4).setCellValue("Total Travel Time =");
+		curRow.createCell(5).setCellValue(mainDepots.getAttributes().getTotalTravelTime());
+		curRow.createCell(6).setCellValue("Total Cost = ");
+		curRow.createCell(7).setCellValue(Math.round(mainDepots.getAttributes().getTotalCost()*100.0)/100.0);
+			
+		rowCounter++;
+		curRow = sheet.createRow(rowCounter);
+			
+		Depot depotHead = mainDepots.getHead();
+		Depot depotTail = mainDepots.getTail();
+		
+		//Truck header info
+		curRow.createCell(0).setCellValue("Truck #");
+		curRow.createCell(1).setCellValue("MaxCap:");
+		curRow.createCell(2).setCellValue("Demand:");
+		
+		//loop through Depots, trucks, nodes
+		while (depotHead != depotTail) 
+		{
+			Truck truckHead = depotHead.getMainTrucks().getHead();
+			Truck truckTail = depotHead.getMainTrucks().getTail();
+			
+			//print truck data
+			while (truckHead != truckTail) 
+			{
+				try 
+				{
+					rowCounter++;
+					curRow = sheet.createRow(rowCounter);
+					
+					
+					curRow.createCell(1).setCellValue(truckHead.getTruckType().getMaxCapacity());
+					curRow.createCell(0).setCellValue(truckHead.getTruckNum());
+					curRow.createCell(2).setCellValue(truckHead.getAttributes().getTotalDemand());
+					
+					
+					Nodes nodesHead = truckHead.getMainNodes().getHead().getNext();
+					Nodes nodesTail = truckHead.getMainNodes().getTail();
+					
+					rowCounter++;
+					curRow = sheet.createRow(rowCounter);
+					
+					curRow.createCell(0).setCellValue("ROUTE:");
+					int cellCount = 1;
+					
+					//print rout data
+					while (nodesHead != nodesTail) 
+					{
+						curRow.createCell(cellCount).setCellValue(nodesHead.getIndex());
 
+						cellCount++;
+						nodesHead = nodesHead.getNext();
+					}
+					
+					cellCount = 0;
+				}
+				catch(NullPointerException ex)
+				{
+						System.out.println("Null truck types detected");
+						rowCounter--;
+				}
+					truckHead = truckHead.getNext();
+			}
+			depotHead = depotHead.getNext();
+		}
+			 
+			rowCounter +=2;
+			curRow = sheet.createRow(rowCounter);
+			
+			curRow.createCell(0).setCellValue("optimization Info");
+			
+			rowCounter ++;
+			curRow = sheet.createRow(rowCounter);
+			
+			//print Optimization information
+			for (int i = 0; i < optInformation.size(); i++) 
+			{
+				curRow.createCell(i).setCellValue(optInformation.elementAt(i).toString());
+			}
+			
+			try 
+		    {
+				FileOutputStream fout = new FileOutputStream(new File(ZeusProblemInfo.getOutputPath() + file + "_short.xlsx"));
+				//FileOutputStream fout = new FileOutputStream(new File(ProblemInfo1.outputPath + file + "_short.xlsx"));
+		    	workbook.write(fout); 
+		        fout.close();
+		    } 
+		    catch (Exception e) 
+		    { 
+		       e.printStackTrace(); 
+		    } 
+	}
+	
+	
+	
+	// Create a excel file to put in the final solutions
+	 
+	public void writeLongSolutionToExcel(String file) {
+		try {
+			// setting up workbook, row 1 information
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			PrintStream fos = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()+ file + "_long.xlsx"));
+			//PrintStream fos = new PrintStream(new FileOutputStream(ProblemInfo1.outputPath + file + "_long.xlsx"));
+			XSSFSheet sheet = workbook.createSheet("Sheet1");
+			XSSFRow row1 = sheet.createRow(0);
+			row1.createCell(0).setCellValue(ZeusProblemInfo.getNumDepots()); 
+			//row1.createCell(0).setCellValue(ProblemInfo1.numDepots); 
+			
+			// row 2 information, depot information(?)
+			XSSFRow row2 = sheet.createRow(1);
+			row2.createCell(0).setCellValue(mainDepots.getVRPHead().getNext().getNext().getDepotNum()); 
+			row2.createCell(1).setCellValue(mainDepots.getVRPHead().getNext().getXCoord()); // depot location x
+			row2.createCell(2).setCellValue(mainDepots.getVRPHead().getNext().getYCoord()); // depot location y
+			row2.createCell(3).setCellValue(mainDepots.getAttributes().getTotalDemand());
+			row2.createCell(4).setCellValue(mainDepots.getAttributes().getTotalDistance());
+			row2.createCell(5).setCellValue(ZeusProblemInfo.getNoOfVehs());
+			//row2.createCell(5).setCellValue(ProblemInfo1.noOfVehs);
+			
+			// row 3 information, truck information(?)
+			XSSFRow row3 = sheet.createRow(2);
+			row3.createCell(0).setCellValue(mainDepots.getVRPHead().getNext().getMainTrucks().getHead().getNext().getTruckNum()); // what is this
+			row3.createCell(1).setCellValue(mainDepots.getNumTrucksUsed());
+			row3.createCell(2).setCellValue(mainDepots.getHead().getNext().getMainTrucks().getHead().getNext().getAttributes().getTotalDemand());
+			row3.createCell(3).setCellValue(mainDepots.getAttributes().getTotalCost());
+			row3.createCell(4).setCellValue(mainDepots.getHead().getNext().getMainTrucks().getHead().getNext().getTruckType().getMaxDuration());
+			row3.createCell(5).setCellValue(mainDepots.getHead().getNext().getMainTrucks().getHead().getNext().getTruckType().getMaxCapacity());
+			row3.createCell(6).setCellValue(ZeusProblemInfo.getNoOfShips());
+			//row3.createCell(6).setCellValue(ProblemInfo1.noOfShips);
+			
+			int curRow = 3;
+			Depot depotHead = mainDepots.getHead();
+			Depot depotTail = mainDepots.getTail();
+			
+			// depots
+			while (depotHead != depotTail) {
+				Truck truckHead = depotHead.getMainTrucks().getHead();
+				Truck truckTail = depotHead.getMainTrucks().getTail();
+				
+				// trucks
+				while (truckHead != truckTail) {
+					Nodes nodesHead = truckHead.getMainNodes().getHead().getNext();
+					Nodes nodesTail = truckHead.getMainNodes().getTail();
+					
+					// nodes
+					while (nodesHead != nodesTail) {
+						XSSFRow newRow = sheet.createRow(curRow);
+						int isAssigned = (nodesHead) != null ? 1 : 0;
+						newRow.createCell(0).setCellValue(nodesHead.getIndex());
+						newRow.createCell(1).setCellValue(nodesHead.getShipment().getDemand());
+						newRow.createCell(2).setCellValue(nodesHead.getShipment().getXCoord());
+						newRow.createCell(3).setCellValue(nodesHead.getShipment().getYCoord());
+						newRow.createCell(4).setCellValue(isAssigned);
+						curRow++;
+						nodesHead = nodesHead.getNext();
+					}
+				truckHead = truckHead.getNext();
+				}
+			depotHead = depotHead.getNext();
+			}
+		workbook.write(fos);
+		fos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}	
+	}
+	
+
+	
+	//  Will write a long detailed solution for the problem
+	//  @param file name of the file to write to
+	 
+	public void writeLongSolutionTxt(String file) {
+		try {
+			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath() + file + "_long.txt"));
+			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo1.
+			//		outputPath + file + "_long.txt"));
+			mainDepots.printDepotLinkedList(ps);
+		}
+		catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+
+
+	// Will write a short solution for the problem
+	// @param file name of the file to write to
+	 
+	public void writeShortSolutionTxt(String file) {
+		try {
+			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo.
+			//outputPath + "/" + file + "_short.txt"));
+			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()
+					+ file + "_short.txt"));
+			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo1.
+					//outputPath + file + "_short.txt"));
+
+			ps.println("File: " + file + " Num Depots: " +
+					ZeusProblemInfo.getNumDepots() + " Num Pick Up Points: " +
+					ZeusProblemInfo.getNumCustomers() + " Num Trucks: " +
+					ZeusProblemInfo.getNumTrucks()+ " Processing Time: " +
+					//ProblemInfo1.numDepots + " Num Pick Up Points: " +
+					//ProblemInfo1.numCustomers + " Num Trucks: " +
+					//ProblemInfo1.numTrucks + " Processing Time: " +
+					(endTime - startTime) / 1000 + " seconds");
+			ps.println(mainDepots.getAttributes().toDetailedString());
+			ps.println();
+
+			Depot depotHead = mainDepots.getHead();
+			Depot depotTail = mainDepots.getTail();
+
+			while (depotHead != depotTail) {
+				Truck truckHead = depotHead.getMainTrucks().getHead();
+				Truck truckTail = depotHead.getMainTrucks().getTail();
+
+				while (truckHead != truckTail) {
+					ps.print("Truck #" + truckHead.getTruckNum() + " MaxCap: " +
+							truckHead.getTruckType().getMaxCapacity() + " Demand: " +
+							truckHead.getAttributes().getTotalDemand() + " ROUTE:");
+
+					Nodes nodesHead = truckHead.getMainNodes().getHead();
+					Nodes nodesTail = truckHead.getMainNodes().getTail();
+
+					while (nodesHead != nodesTail) {
+						ps.print(nodesHead.getIndex() + " ");
+						nodesHead = nodesHead.getNext();
+					}
+
+					ps.println();
+					truckHead = truckHead.getNext();
+				}
+
+				ps.println();
+				ps.println();
+				depotHead = depotHead.getNext();
+			}
+			for (int i = 0; i < optInformation.size(); i++) {
+				ps.println(optInformation.elementAt(i));
+			}
+		}
+		catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+	
+	
+	 // Create a excel file to put in the final solutions
+	 
+	
+	public static void createFinalExcelFile(int numSolution){
+		  
+		  
+		  int rowCounter = 0;
+		  int curCol = 0;	//column counter
+		  XSSFWorkbook workbook = new XSSFWorkbook(); // create a book
+		  XSSFSheet sheet = workbook.createSheet("Sheet1");// create a sheet
+		  XSSFRow curRow = sheet.createRow(rowCounter++); // create a row
+		  
+		  //fill the first row of excel, Solution numbers
+		  curCol = 2;
+		  for(int i=0; i<numSolution; i++){
+			  curRow.createCell(curCol).setCellValue("Solution " + (i));
+			  curCol = curCol+4;		  
+		  }
+		  
+		  curRow = sheet.createRow(rowCounter++); // create a row
+		  curCol = 0;
+		  curRow.createCell(curCol++).setCellValue("Problem");
+		  curRow.createCell(curCol++).setCellValue("Best Known Solution");	  
+		  for(int i=0; i<numSolution; i++){
+			  curRow.createCell(curCol++).setCellValue("Num of Vehicle");
+			  curRow.createCell(curCol++).setCellValue("Distance");
+			  curRow.createCell(curCol++).setCellValue("Cost");
+			  curRow.createCell(curCol++).setCellValue("Percentage");		  	  
+		  }
+		  	  
+	      //save the file
+	      try 
+	      {
+	    	  FileOutputStream fout = new FileOutputStream(new File(ZeusProblemInfo.getOutputPath() + "Comparison.xlsx"));
+	    	  //FileOutputStream fout = new FileOutputStream(new File(ProblemInfo1.outputPath + "Comparison.xlsx"));
+	    	  workbook.write(fout); 
+	          fout.close();
+	      } 
+	      catch (Exception e) 
+	      { 
+	          e.printStackTrace(); 
+	      } 
+		  
+	  }
+   * 
+   * 
+   * 
+   * */
+  //Excel file stuff
+  
+  
 } //End of TOP file
