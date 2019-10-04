@@ -79,7 +79,6 @@ public class TOP {
       if (TOPProblemInfo.enableOptimizations == true) {
         //mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPProblemInfo.TOPCostType.SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPCostType.SCORE_INVERSE));
-
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
@@ -172,8 +171,8 @@ public class TOP {
       runQA();
 
       //Write the solution files
-      writeLongSolution(dataFile.substring(dataFile.lastIndexOf("/") + 1));
-      writeShortSolution(dataFile.substring(dataFile.lastIndexOf("/") + 1));
+      writeLongSolutionToExcel(dataFile.substring(dataFile.lastIndexOf("/") + 1));
+      writeShortSolutionExcel(dataFile.substring(dataFile.lastIndexOf("/") + 1));
 
       //Display the score
       Settings.printDebug(Settings.COMMENT, "Total Score: " + getTotalScore());
@@ -380,211 +379,22 @@ public class TOP {
     return retValue;
   }
 
-  /**
-   * Write out the data file that was read in
-   * @param file
-   */
 
-  public void writeDataFile(String file) {
-    try {
-      PrintStream ps = new PrintStream(new FileOutputStream(file +
-	  "_students.txt"));
-      mainShipments.writeTOPShipments(ps);
-    }
-    catch (IOException ioex) {
-      ioex.printStackTrace();
-    }
-  }
-
-  /**
-   * Will write a long detailed solution for the problem
-   * @param file - Name of the file to write to
-   */
-  public void writeLongSolution(String file) {
-    try {
-      PrintStream ps = new PrintStream(new FileOutputStream(
-	  TOPProblemInfo.outputPath + file + "_long.txt"));
-      mainDepots.printDepotLinkedList(ps);
-    }
-    catch (IOException ioex) {
-      ioex.printStackTrace();
-    }
-  }
-
-  /**
-   * Write out both the long and short solution files.
-   */
+  //sGA.java needs this
   public void writeAllSolutionFiles() {
-    writeDataFile(this.dataFile);
-    writeLongSolution(this.dataFile);
-    writeShortSolution(this.dataFile);
-  }
-
-  /**
-   * Will write a short solution for the problem
-   * @param file - Name of the file to write to
-   */
-  public void writeShortSolution(String file) {
-    double totalScore = TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDemand(mainDepots); //getTeamScore();
-    try {
-      PrintStream ps = new PrintStream(new FileOutputStream(
-	  TOPProblemInfo.outputPath + file + "_short.txt"));
-      TOPDepot d = (TOPDepot)mainDepots.getHead();
-
-      ps.println("File: " + file + " Num Depots: "
-		 + TOPProblemInfo.numDepots + " Num Pick Up Points: "
-		 + TOPProblemInfo.numCustomers + " Num Trucks: "
-		 + TOPProblemInfo.numTrucks + " Truck Max Travel Time: "
-		 + TOPProblemInfo.truckMaxTravelTime + " Processing Time: "
-		 + (endTime - startTime) / 1000 + " seconds");
-      ps.println(mainDepots.getAttributes().toDetailedString());
-      ps.println("Total Score: " + totalScore);
-
-      ps.println();
-
-      while (d != null) {
-	TOPTruck t = (TOPTruck)d.getMainTrucks().getHead();
-
-	while (t != null) {
-	  ps.print("Truck #" + t.getTruckNum() + " MaxCap: "
-		   + t.getTruckType().getMaxCapacity() + " Demand: "
-		   + t.getAttributes().getTotalDemand() + " ROUTE:");
-	  Nodes p = t.getMainNodes().getHead();
-
-	  while (p != null) {
-	    ps.print(p.getIndex() + " ");
-	    p = p.getNext();
+	    writeDataFile(this.dataFile);
+	    writeLongSolutionToExcel(this.dataFile);
+	    writeShortSolutionExcel(this.dataFile);
 	  }
-
-	  if (t.getIsTeamMember()) {
-	    ps.print(" (TEAM MEMBER)");
-	  }
-	  else {
-	    ps.print(" (NOT ON TEAM)");
-	  }
-	  ps.println();
-	  t = (TOPTruck)t.getNext();
-	}
-
-	ps.println();
-	ps.println();
-	d = (TOPDepot)d.getNext();
-      }
-      for (int i = 0; i < optInformation.size(); i++) {
-	ps.println(optInformation.elementAt(i));
-      }
-    }
-    catch (IOException ioex) {
-      ioex.printStackTrace();
-    }
-  }
-
-  /**
-   * Runs optmizations inserted into the mainOpts vector
-   */
-  public void runOptimizations() {
-    TOPOptEntry opt;
-
-    for (int i = 0; i < mainOpts.size(); i++) {
-      opt = mainOpts.get(i);
-      Settings.printDebug(Settings.COMMENT, "Running " + opt);
-
-      optInformation.add(opt.toString() + " " + opt.run(mainDepots));
-
-      Settings.printDebug(Settings.COMMENT, opt.toString() + " Stats: " + mainDepots.getTeamSolutionString());
-    }
-  }
-
-  /**
-   * Runs a series of tests to ensure that the solution is feasible
-   */
-  public void maintainFeasibility() {
-
-    TOPTruck currentTruck = mainDepots.getStartDepot().getTOPMainTrucks().getTOPHead();
-
-    TOPNodesLinkedList nList = null;
-    TOPNodes n1 = null;
-    TOPNodes n2 = null;
-    TOPNodes n3 = null;
-
-    // If the depots are further apart than the maximum travel distance, the
-    // single truck will have a scoreless, yet unfeasible route.  In this case,
-    // we merely loop through the trucks.
-    while (currentTruck != null) {
-      nList = currentTruck.getTOPMainNodes();
-      if (nList != null) {
-	n1 = nList.getTOPHead();
-	n2 = nList.getTOPTail();
-	n3 = n1.getTOPNext();
-
-	if (n2 == null || n3 == null) {
-	  currentTruck = currentTruck.getTOPNext();
-	}
-	else if (n2 == n3) {
-	  currentTruck = currentTruck.getTOPNext();
-	}
-	else {
-	  break;
-	}
-      }
-    }
-
-    while (currentTruck != null) {
-      while (currentTruck.getTOPMainNodes().getTOPFeasibility().isPostOptFeasible() == false) {
-	currentTruck.getTOPMainNodes().removeLowestScoringShipment();
-	if (currentTruck.getTOPMainNodes() == null) {
-	  break;
-	}
-	if (currentTruck.getTOPMainNodes().getTOPFeasibility() == null) {
-	  break;
-	}
-      }
-
-      currentTruck = currentTruck.getTOPNext();
-    }
-  }
-
-  /**
-   * Return the fitness for the GA.
-   * @return double
-   * Added by Pete Schallot
-   */
-  public double getTotalFitness() {
-    double demand = TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDemand(this.mainDepots);
-    double distance = TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDistance(this.mainDepots);
-
-    if (distance == 0 || demand == 0) {
-      return 0;
-    }
-    else {
-      return demand + demand / (distance + demand);
-    }
-  }
-
-  /**
-   * Return the total score.
-   * @return double
-   */
-  public double getTotalScore() {
-    return TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDemand(this.mainDepots);
-  }
-
-  /**
-   * Opens a Zeus GUI window, displaying the current problem
-   * Added by David Crissman
-   */
-  public void displayGUI() {
-    TOPGui guiPost = new TOPGui(mainDepots, mainShipments);
-  }
   
-  ///EXECL FILE STUFF
-  /*
-   * public void writeDataFile(String file) {
+  
+///EXECL FILE STUFF
+  public void writeDataFile(String file) {
 		try {
 			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()+file +"_students.txt"));
 			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo1.
 			//		outputPath +file +"_students.txt"));
-			mainShipments.writeVRPShipments(ps);
+			mainShipments.writeTOPShipments(ps);
 		}
 		catch (IOException ioex) {
 			ioex.printStackTrace();
@@ -735,9 +545,9 @@ public class TOP {
 			
 			// row 2 information, depot information(?)
 			XSSFRow row2 = sheet.createRow(1);
-			row2.createCell(0).setCellValue(mainDepots.getVRPHead().getNext().getNext().getDepotNum()); 
-			row2.createCell(1).setCellValue(mainDepots.getVRPHead().getNext().getXCoord()); // depot location x
-			row2.createCell(2).setCellValue(mainDepots.getVRPHead().getNext().getYCoord()); // depot location y
+			row2.createCell(0).setCellValue(mainDepots.getTOPHead().getNext().getNext().getDepotNum()); 
+			row2.createCell(1).setCellValue(mainDepots.getTOPHead().getNext().getXCoord()); // depot location x
+			row2.createCell(2).setCellValue(mainDepots.getTOPHead().getNext().getYCoord()); // depot location y
 			row2.createCell(3).setCellValue(mainDepots.getAttributes().getTotalDemand());
 			row2.createCell(4).setCellValue(mainDepots.getAttributes().getTotalDistance());
 			row2.createCell(5).setCellValue(ZeusProblemInfo.getNoOfVehs());
@@ -745,7 +555,7 @@ public class TOP {
 			
 			// row 3 information, truck information(?)
 			XSSFRow row3 = sheet.createRow(2);
-			row3.createCell(0).setCellValue(mainDepots.getVRPHead().getNext().getMainTrucks().getHead().getNext().getTruckNum()); // what is this
+			row3.createCell(0).setCellValue(mainDepots.getTOPHead().getNext().getMainTrucks().getHead().getNext().getTruckNum()); // what is this
 			row3.createCell(1).setCellValue(mainDepots.getNumTrucksUsed());
 			row3.createCell(2).setCellValue(mainDepots.getHead().getNext().getMainTrucks().getHead().getNext().getAttributes().getTotalDemand());
 			row3.createCell(3).setCellValue(mainDepots.getAttributes().getTotalCost());
@@ -914,11 +724,108 @@ public class TOP {
 	      } 
 		  
 	  }
-   * 
-   * 
-   * 
-   * */
-  //Excel file stuff
+  
+
+  /**
+   * Runs optmizations inserted into the mainOpts vector
+   */
+  public void runOptimizations() {
+    TOPOptEntry opt;
+
+    for (int i = 0; i < mainOpts.size(); i++) {
+      opt = mainOpts.get(i);
+      Settings.printDebug(Settings.COMMENT, "Running " + opt);
+
+      optInformation.add(opt.toString() + " " + opt.run(mainDepots));
+
+      Settings.printDebug(Settings.COMMENT, opt.toString() + " Stats: " + mainDepots.getTeamSolutionString());
+    }
+  }
+
+  /**
+   * Runs a series of tests to ensure that the solution is feasible
+   */
+  public void maintainFeasibility() {
+
+    TOPTruck currentTruck = mainDepots.getStartDepot().getTOPMainTrucks().getTOPHead();
+
+    TOPNodesLinkedList nList = null;
+    TOPNodes n1 = null;
+    TOPNodes n2 = null;
+    TOPNodes n3 = null;
+
+    // If the depots are further apart than the maximum travel distance, the
+    // single truck will have a scoreless, yet unfeasible route.  In this case,
+    // we merely loop through the trucks.
+    while (currentTruck != null) {
+      nList = currentTruck.getTOPMainNodes();
+      if (nList != null) {
+	n1 = nList.getTOPHead();
+	n2 = nList.getTOPTail();
+	n3 = n1.getTOPNext();
+
+	if (n2 == null || n3 == null) {
+	  currentTruck = currentTruck.getTOPNext();
+	}
+	else if (n2 == n3) {
+	  currentTruck = currentTruck.getTOPNext();
+	}
+	else {
+	  break;
+	}
+      }
+    }
+
+    while (currentTruck != null) {
+      while (currentTruck.getTOPMainNodes().getTOPFeasibility().isPostOptFeasible() == false) {
+	currentTruck.getTOPMainNodes().removeLowestScoringShipment();
+	if (currentTruck.getTOPMainNodes() == null) {
+	  break;
+	}
+	if (currentTruck.getTOPMainNodes().getTOPFeasibility() == null) {
+	  break;
+	}
+      }
+
+      currentTruck = currentTruck.getTOPNext();
+    }
+  }
+
+  /**
+   * Return the fitness for the GA.
+   * @return double
+   * Added by Pete Schallot
+   */
+  public double getTotalFitness() {
+    double demand = TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDemand(this.mainDepots);
+    double distance = TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDistance(this.mainDepots);
+
+    if (distance == 0 || demand == 0) {
+      return 0;
+    }
+    else {
+      return demand + demand / (distance + demand);
+    }
+  }
+
+  /**
+   * Return the total score.
+   * @return double
+   */
+  public double getTotalScore() {
+    return TOPProblemInfo.getTOPDepotLLCostFunctions().getTeamTotalDemand(this.mainDepots);
+  }
+
+  /**
+   * Opens a Zeus GUI window, displaying the current problem
+   * Added by David Crissman
+   */
+  public void displayGUI() {
+    TOPGui guiPost = new TOPGui(mainDepots, mainShipments);
+  }
+  
+  
+
   
   
 } //End of TOP file
