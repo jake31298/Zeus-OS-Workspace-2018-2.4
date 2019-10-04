@@ -5,7 +5,3 @@ TOPOptEntry has functions that need to be setup
 Errors:
 	edu.sru.thangiah.zeus.top
 		TOP.JAVA
-
-TODO:
-	Read Excel files
-	Fix errors
