@@ -2,7 +2,8 @@ package edu.sru.thangiah.zeus.top;
 
 import java.util.Vector;
 import edu.sru.thangiah.zeus.top.topcostfunctions.*;
-import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
+
+
 //import edu.sru.thangiah.zeus.core.ProblemInfo;
 
 
@@ -61,8 +62,8 @@ public static TOPTruckLLCostFunctions truckLLLevelCostF;
 public static TOPDepotCostFunctions depotLevelCostF;
 public static TOPDepotLLCostFunctions depotLLLevelCostF;
 public static Object tempFileLocation;
-public static String workingDirectory;
-public static String inputPath;
+public static String workingDirectory= "\\Zeus";
+public static String inputPath; //\\data\\TOP\\Problems\\";
 public static String outputPath;
 public static LinearGreedyInsertShipment insertShipType;
 public static TOPShipmentLinkedList selectShipType;

@@ -50,7 +50,7 @@ public class TOPRoot {
     TOPProblemInfo.gaMutationRate = 0.005;
 
     //Solve the problem(s)
-    runSingleProblem("PROB7-4-t.PRN", true, true, true); //Problem 7-4-t, with GA, optimizations, and GUI enabled
+    runSingleProblem("TOP1.2People.xlsx", true, true, true); //Problem 7-4-t, with GA, optimizations, and GUI enabled
     //runScriptFile("TOPScript.zsf");
   }
 
@@ -69,12 +69,12 @@ public class TOPRoot {
     TOPProblemInfo.enableGA = ga;
 
     //Run the problem, with or without the GA
-    if (TOPProblemInfo.enableGA == true) {
-      new sGA(fileName);
-    }
-    else {
+   // if (TOPProblemInfo.enableGA == true) {
+   //   new sGA(fileName);
+   // }
+   // else {
       new TOP(fileName);
-    }
+   // }
 
   }
 

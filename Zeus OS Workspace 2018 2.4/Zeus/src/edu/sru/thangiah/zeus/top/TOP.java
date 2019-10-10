@@ -17,6 +17,8 @@ import edu.sru.thangiah.zeus.top.*;
 import edu.sru.thangiah.zeus.top.TOPProblemInfo.TOPCostType;
 import edu.sru.thangiah.zeus.localopts.interopts.*;
 
+ 
+
 
 
 //import edu.sru.thangiah.zeus.localopts.*;
@@ -53,7 +55,7 @@ public class TOP {
     double targetX, targetY, tempX;                                      //Coordinates of the target point
     OptInfo opInfo;
 
-    dataFile = fileName;
+    dataFile = "TOP1.2People.xlsx";
     mainOpts = new Vector();
     optInformation = new Vector<String>();
     mainShipments = new TOPShipmentLinkedList();
@@ -76,7 +78,8 @@ public class TOP {
     }
     else {
       //If optimizations are enabled, create a list of them to be run
-      if (TOPProblemInfo.enableOptimizations == true) {
+/*
+    	if (TOPProblemInfo.enableOptimizations == true) {
         //mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPProblemInfo.TOPCostType.SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()), TOPCostType.SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
@@ -84,11 +87,11 @@ public class TOP {
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         //mainOpts.add(new TOPOptEntry(new TOPReduction(), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new TOPReduction(), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-        mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new OneOpt(false)), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
+        mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new OneOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
         mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()), TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
 
       }
-
+*/
       //Set up the shipment insertion type
       TOPProblemInfo.insertShipType = new LinearGreedyInsertShipment();
       Settings.printDebug(Settings.COMMENT, LinearGreedyInsertShipment.WhoAmI());
@@ -391,7 +394,7 @@ public class TOP {
 ///EXECL FILE STUFF
   public void writeDataFile(String file) {
 		try {
-			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()+file +"_students.txt"));
+			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()+file +"TOP1.2People..xlsx"));
 			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo1.
 			//		outputPath +file +"_students.txt"));
 			mainShipments.writeTOPShipments(ps);
