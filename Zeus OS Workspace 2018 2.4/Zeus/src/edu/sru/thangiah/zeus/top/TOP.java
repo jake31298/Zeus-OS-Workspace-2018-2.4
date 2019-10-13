@@ -9,6 +9,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import edu.sru.thangiah.zeus.top.topgui.*;
 import edu.sru.thangiah.zeus.top.topqualityassurance.*;
+import edu.sru.thangiah.zeus.vrp.VRPDepot;
+import edu.sru.thangiah.zeus.vrp.VRPTruck;
+import edu.sru.thangiah.zeus.vrp.VRPTruckType;
 import edu.sru.thangiah.zeus.core.*;
 import edu.sru.thangiah.zeus.localopts.*;
 import edu.sru.thangiah.zeus.localopts.interopts.FirstFirstInterSearch;
@@ -55,14 +58,15 @@ public class TOP {
     double targetX, targetY, tempX;                                      //Coordinates of the target point
     OptInfo opInfo;
 
-    dataFile = "TOP1.2People.xlsx";
+    dataFile = fileName;
     mainOpts = new Vector();
     optInformation = new Vector<String>();
     mainShipments = new TOPShipmentLinkedList();
     mainDepots = new TOPDepotLinkedList();
 
     //read in the TOP data
-    readDataFromFile(TOPProblemInfo.inputPath + dataFile);
+    //readDataFromFile(TOPProblemInfo.inputPath + dataFile);
+    readDataFromExcelFile(TOPProblemInfo.inputPath + dataFile);
     Settings.printDebug(Settings.COMMENT, "Read Data File: " + TOPProblemInfo.inputPath + dataFile);
     writeDataFile(dataFile.substring(dataFile.lastIndexOf("/") + 1));
 
@@ -392,6 +396,294 @@ public class TOP {
   
   
 ///EXECL FILE STUFF
+  
+  /*Read information form an excel file 
+  Converted from VRP to work with TOP
+  Modified By Steven Enterline
+  */
+  
+	public int readDataFromExcelFile(String TOPFileName) {
+		// read in the MDVRP data from the listed file and load the information
+		// into the availShipments linked list
+
+		//type = 0 (MDVRP)
+		//     = 1 (PTSP)
+		//     = 2 (PVRP)
+		char ch;
+		String temp = "";
+		int index = 0,
+				j = 0,
+				type = 0, //type
+				m        = 0,                           //number of vehicles
+				n        = 0,                           //number of customers
+				t        = 0,                           //number of days(or depots)
+				D        = 0,                           //maximum duration of route
+				Q        = 0;                           //maximum load of vehicle
+		int p = 3; //Np neighborhood size
+
+		int depotIndex;
+
+		//Open the requested file
+		XSSFWorkbook workbook = new XSSFWorkbook();    
+		FileInputStream fis;
+		XSSFSheet sheet;
+		XSSFRow curRow;
+		int rowCounter = 0; //initial the row counter
+
+		//    FileInputStream fis;
+		//    InputStreamReader isr;
+		//    BufferedReader br;
+		try {
+			fis = new FileInputStream(TOPFileName);
+			workbook = new XSSFWorkbook(fis);
+			sheet = workbook.getSheetAt(0);
+			curRow = sheet.getRow(rowCounter+1); // the 2nd row is the problem data
+
+			//      fis = new FileInputStream(VRPFileName);
+			//      isr = new InputStreamReader(fis);
+			//      br = new BufferedReader(isr);
+		}
+		catch (Exception e) {
+			System.out.println("readDataFromExcelFile - "+TOPFileName+" File is not present");
+			return 0;
+		}
+
+		//InitData             currentProb = new InitData();    //Class for initializing data
+
+		//This section will get the initial information from the data file
+		//Read in the first line from the file
+		//String readLn;
+		//StringTokenizer st;
+
+		//This reads in the first line that is used to determine the total
+		//numer of customers and type of problem
+		//typePvrp is + type);
+		//numVeh is         + m; //not really used in an MDVRP
+		//numCust is        + n;
+		//Days is           + t; //Depots in the case of MDVRP
+		//Depot duration is + D;
+		//capacity is       + Q;
+
+		//read in the first line
+		try {
+			type = (int)curRow.getCell(0).getNumericCellValue();
+			m = (int)curRow.getCell(1).getNumericCellValue();
+			n = (int)curRow.getCell(2).getNumericCellValue();
+			t = (int)curRow.getCell(3).getNumericCellValue();
+			D = (int)curRow.getCell(4).getNumericCellValue();
+			Q = (int)curRow.getCell(5).getNumericCellValue();
+		}
+		catch (Exception e) {
+			System.out.println("Line could not be read in");
+		}
+
+		//Put the problem information into the ProblemInfo class
+		//set the problem info for the problem
+		ZeusProblemInfo.setNumDepots(1); 			  //Set the number of depots to 1 for this problem
+		ZeusProblemInfo.setProbFileName(TOPFileName);   //name of the problem file being read in
+		ZeusProblemInfo.setProbType(type);		  //problem type
+		ZeusProblemInfo.setNoOfVehs(m);			  //number of vehicles
+		ZeusProblemInfo.setNoOfShips(n);			  //number of shipments
+		ZeusProblemInfo.setNoOfDays(t);			  //number of days (horizon) or number of depots for MDVRP
+		
+		//ProblemInfo1.numDepots = t; //Set the number of depots to 1 for this problem
+		//ProblemInfo1.fileName = VRPFileName; //name of the file being read in
+		//ProblemInfo1.probType = type; //problem type
+		//ProblemInfo1.noOfVehs = m; //number of vehicles
+		//ProblemInfo1.noOfShips = n; //number of shipments
+		//ProblemInfo1.noOfDays = t; //number of days (horizon) or number of depots for MDVRP
+
+		if (Q == 0) { //if there is no maximum capacity, set it to a very large number
+			Q = 999999999;
+		}
+		if (D == 0) { //if there is no travel time, set it to a very large number
+			D = 999999999; //if there is not maximum distance, set it to a very large number
+			//ProblemInfo.maxCapacity = Q;  //maximum capacity of a vehicle
+			//ProblemInfo.maxDistance = D;  //maximum distance of a vehicle
+		}
+		/** @todo  There three variables need to be defined at the beginning of
+		 * the method */
+		float maxCapacity = Q; //maximum capacity of a vehicle
+		float maxDistance = D; //maximum distance of a vehicle
+
+		String serviceType = "1"; //serviceType is the trucktype. Should match with
+		//required truck type
+		//In some problems, different truck types might be present to solve
+		//the problem. For this problem, we assume that there is only one
+		//truck type that is available.
+		//loop through each truck type and store each one in the vector
+		int numTruckTypes = 1;
+		for (int i = 0; i < numTruckTypes; i++) {
+			VRPTruckType truckType = new VRPTruckType(i, maxDistance,
+					maxCapacity, serviceType);
+			ZeusProblemInfo.addTruckTypes(truckType);
+			//ProblemInfo1.truckTypes.add(truckType);
+		}
+
+		//Some problems tend to have different customer types. In this problem
+		//there is only one customter type. The integer value for the customer type
+		//should match with the integer value for the truck type for the compatibiliy
+		//check to work
+		//read in the different customer types
+		Vector custTypes = new Vector();
+		//Obtain the different customer types
+		for (int ct = 0; ct < 1; ct++) {
+			custTypes.add(new Integer(1));
+		}
+
+		//place the number of depots and number of shipments in the linked list instance
+		//These no longer seem to be needed for the shipment linked list. The total number of
+		//shipments are tallied when they are inserted into the linked list
+		//mainShipments.numShipments = n;
+		//mainShipments.noDepots = t;
+		//mainShipments.maxCapacity = Q;
+		//mainShipments.maxDuration = D ;
+
+		//display the information from the first line
+		//System.out.println("typePvrp is       " + type);
+		//System.out.println("numVeh is         " + m);
+		//System.out.println("numCust is        " + n);
+		//System.out.println("days is           " + t);
+		//System.out.println("Depot duration is " + D);
+		//System.out.println("capacity is       " + Q);
+
+		if (type != 0) { //then it is not an MDVRP problem
+			System.out.println("Problem is not an MDVRP problem");
+			return 0;
+		}
+
+		//This section will get the depot x and y for the PVRP and the PTSP.
+		float x = 0, //x coordinate
+				y = 0; //y coordinate
+		int i = 0, //customer number
+				d = 0, //service duration
+				q = 0, //demand
+				f = 0, //frequency of visit
+				a = 0; //number of combinations allowed
+		int runTimes;
+
+		//Use 1 less the maximum as the 0 index is not used
+		//declare the total number of combinations
+		//int list[] = new int[ProblemInfo.MAX_COMBINATIONS];
+		//array of 0'1 and 1's for the combinations
+		//int currentComb[][] = new int[ProblemInfo.MAX_HORIZON][ProblemInfo.MAX_COMBINATIONS];
+		//TODO Max_horizon = 7 it's too small
+
+		//if MDVRP problem, readn in n+t lines
+		if (type == 0) {
+			runTimes = n;
+
+		}
+		//if  PVRP/PTSP, read in n+1 lines
+		else {
+			runTimes = n + 1;
+			//This section will get the customers/depots and related information
+		}
+
+		try {
+			//The first for loop runtimes dependent upon how many lines are to be read in
+			//The next for loop reads the line into s.  Then the entire string in s
+			//is processed until the the entire line is processed and there are no
+			//more characters are to be processed. There is a case for each index
+			//except for the combinations.  The combinations are processed
+			//until the last character in s is processed
+
+			rowCounter = 3; //set the rowCounter, customer data begin from the 4th row
+
+			for (int k = 0; k < runTimes; k++) {
+				index = 0;
+				temp = "";
+				curRow = sheet.getRow(rowCounter);
+				try { // read the current row
+					i = (int)curRow.getCell(0).getNumericCellValue();
+					x = (int)curRow.getCell(1).getNumericCellValue();
+					y = (int)curRow.getCell(2).getNumericCellValue();
+					d = (int)curRow.getCell(3).getNumericCellValue();
+					q = (int)curRow.getCell(4).getNumericCellValue();
+					f = (int)curRow.getCell(5).getNumericCellValue();
+					//							a = (int)curRow.getCell(6).getNumericCellValue();
+					//							for(int indexComb=0; indexComb<a; indexComb++){
+					//								list[indexComb] = (int)curRow.getCell(indexComb+7).getNumericCellValue();
+					//							}
+				}
+				catch (Exception e) {
+					System.out.println("Line could not be read in line 474");
+				}
+				//Each combination gets its own set of 0 and 1 combinations
+				//a = number of Combinations, list = [] of comb as ints,
+				//l=index of combination to be decoded,
+				//t = days in planning horizon or #depots
+				//						for (int l = 0; l < a; l++) {
+				//							currentComb[l] = mainShipments.getCurrentComb(list, l, t); // current visit comb
+				//
+				//							//insert the customer data into the linked list
+				//						}
+				Integer custType = (Integer) custTypes.elementAt(0);
+				//Note removed arguemenet may not be right ones
+				mainShipments.insertShipment(i, x, y, q); 
+				
+				//mainShipments.insertShipment(i, x, y, q, d, f, a, custType.toString(),
+				//		list, currentComb);
+
+				//						mainShipments.insertShipment(i, x, y, q, d, f, a, custType.toString(),
+				//								list, currentComb);
+
+				//  type = (Integer) custTypes.elementAt(0);
+				//       shipment = new Shipment(mainShipments.getNumShipments() +
+				//                               1, x, y, 1, d, type.toString(), "" + i);
+				rowCounter++; //go to next row          
+			}// end for
+
+			rowCounter = 3+n+1; //set the rowCounter, depot data begin from the (3+n+1)th row
+			for (int k = 0; k < t; k++) { //add it to the depot linked list
+				curRow = sheet.getRow(rowCounter);
+
+				try { // read the current row
+					i =  (int)curRow.getCell(0).getNumericCellValue();
+					x =  (int)curRow.getCell(1).getNumericCellValue();
+					y =  (int)curRow.getCell(2).getNumericCellValue();
+				}
+				catch (Exception e) {
+					System.out.println("Line could not be read in line 505");
+				}
+
+				//insert the depot into the depot linked list
+				VRPDepot depot = new VRPDepot(i - n, x, y); //n is the number of customers
+				mainDepots.insertDepotLast(depot);
+
+				//Each depot has a mainTrucks. The different truck types available are
+				//inserted into the mainTrucks type. For the VRP, there is only one truck type
+				depot = (VRPDepot) mainDepots.getHead().getNext();
+				for (i = 0; i < ZeusProblemInfo.getTruckTypesSize(); i++) {
+					VRPTruckType ttype = (VRPTruckType) ZeusProblemInfo.getTruckTypesAt(i);
+				//for (i = 0; i < ProblemInfo1.truckTypes.size(); i++) {
+				//		VRPTruckType ttype = (VRPTruckType) ProblemInfo1.truckTypes.
+			//					elementAt(i);
+					depot.getMainTrucks().insertTruckLast(new VRPTruck(ttype,
+							depot.getXCoord(), depot.getYCoord()));                   
+				}
+
+				rowCounter++; //go to next row 
+			} //end for
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Reading the line");
+		}
+
+		//print out the shipment numbers on command line
+		//  mainShipments.printShipNos();
+		//call method to send the data to file
+		try {
+			//availShipments.outputMDVRPShipData(type, t, MDVRPFileName, "outCust.txt");   //problem type, #days or depots
+			//outputMDVRPShipData(type, t, MDVRPFileName, "outCust.txt");   //problem type, #days or depots
+		}
+		catch (Exception e) {
+			System.out.println("Shipment information could not be sent to the file");
+		}
+		return 1;
+	}
+  
   public void writeDataFile(String file) {
 		try {
 			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()+file +"TOP1.2People..xlsx"));
@@ -629,8 +921,7 @@ public class TOP {
 		try {
 			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo.
 			//outputPath + "/" + file + "_short.txt"));
-			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath()
-					+ file + "_short.txt"));
+			PrintStream ps = new PrintStream(new FileOutputStream(ZeusProblemInfo.getOutputPath() + file + "_short.txt"));
 			//PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo1.
 					//outputPath + file + "_short.txt"));
 

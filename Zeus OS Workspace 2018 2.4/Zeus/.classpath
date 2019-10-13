@@ -6,19 +6,19 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/jbcl.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/jdom.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/joda-time-1.5.2.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/jxl.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/RelativeLayout.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/xercesImpl-2.9.1.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/xmlbeans-2.4.0.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/Zeus Core 2018 2.4.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/poi-3.10-FINAL-20140208.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/poi-ooxml-3.10-FINAL-20140208.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/stax-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="Y:/CPSC-464-01.0919/GROUPS/Group 4 - Team Orienterring Problem/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/xmlbeans-2.3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/poi-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/poi-ooxml-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/stax-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/XML File Reader/xmlbeans-2.3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/jbcl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/jdom.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/joda-time-1.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/jxl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/RelativeLayout.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/xercesImpl-2.9.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/xmlbeans-2.4.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tripl/Documents/GitHub/Zeus-OS-Workspace-2018-2.4/Zeus OS Workspace 2018 2.4/Zeus/Libraries/Zeus Core 2018 2.4.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
