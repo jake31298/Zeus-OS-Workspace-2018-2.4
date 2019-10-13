@@ -3,5 +3,5 @@ TOPProblemInfo has variables that need to be understood
 TOPOptEntry has functions that need to be setup
 
 Errors:
-	edu.sru.thangiah.zeus.top
-		TOP.JAVA
+	While the code compiles it does not find the excel file
+	See try catch block in TOP.java
