@@ -25,6 +25,9 @@ private TOPTruck tail;
    */
   public TOPTruckLinkedList() {
     //Assign the attributes
+	  setHead(new TOPTruck()); //header node for head
+		setTail(new TOPTruck()); //tail node for tail
+		linkHeadTail();			  //point head and tail to each other 
     setAttributes(new TOPAttributes());
   }
 

@@ -141,7 +141,16 @@ public class TOPShipment
        }*/
   }
 
-  /**
+  public TOPShipment(int i, float x, float y, int s, String t, int[] list, int[][] currentComb) {
+	  	setIndex(i);
+	    float xCoord = x;
+	    float yCoord = y;
+	    setDemand(s);
+	    setTruckTypeNeeded(t);
+	  
+}
+
+/**
    * Returns the next shipment in the list
    * @return TOPShipment
    */

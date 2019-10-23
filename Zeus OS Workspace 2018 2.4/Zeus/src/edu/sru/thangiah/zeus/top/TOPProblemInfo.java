@@ -70,10 +70,12 @@ public static TOPShipmentLinkedList selectShipType;
 public static int numCustomers;
 public static int numTrucks;
 public static String fileName;
-public static Vector truckTypes;
+public static Vector<TOPTruckType> truckTypes;
 public static int probType;
 public static int noOfVehs;
 public static String numDepots;
+
+
 /* ^
  * |
  * |
@@ -87,7 +89,7 @@ public static String numDepots;
    */
   public TOPProblemInfo() 
   {
-  
+	  
   }
 
   /**

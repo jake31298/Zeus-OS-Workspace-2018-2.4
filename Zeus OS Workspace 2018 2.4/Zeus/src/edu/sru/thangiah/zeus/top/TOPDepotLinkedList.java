@@ -28,12 +28,15 @@ public class TOPDepotLinkedList
   public TOPDepotLinkedList() {
     setAttributes(new TOPAttributes());
 
-    setHead(null);
-    setTail(null);
+    setHead(new TOPDepot());
+    setTail(new TOPDepot());
+    linkHeadTail();	
+    
+    setAttributes(new TOPAttributes());
 
     //When the list is created, it doesn't have a starting or ending depot yet
-    startDepotNum = -1;
-    endDepotNum = -1;
+   // startDepotNum = -1;
+    //endDepotNum = -1;
   }
 
   /**

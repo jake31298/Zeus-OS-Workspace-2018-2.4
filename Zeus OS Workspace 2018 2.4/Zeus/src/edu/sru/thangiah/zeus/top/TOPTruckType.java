@@ -1,5 +1,7 @@
 package edu.sru.thangiah.zeus.top;
 
+import java.util.Vector;
+
 //import the parent class
 import edu.sru.thangiah.zeus.core.TruckType;
 
@@ -48,6 +50,10 @@ public class TOPTruckType
 
     setFixedCost(getMaxCapacity());
     setVariableCost((double) getMaxCapacity() / 1000);
+    
+    //Added to instantiate vector
+	TOPProblemInfo.truckTypes = new Vector<TOPTruckType>();
+
   }
 
   /**
