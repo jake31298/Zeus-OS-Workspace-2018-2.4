@@ -177,6 +177,15 @@ public class TOPShipmentLinkedList
 
     return clonedShipmentLinkedList;
   }
+
+public void insertShipment(int i, float x, float y, int s, String string, int[] list, int[][] currentComb) {
+	
+	TOPShipment thisShip = new TOPShipment(i, x, y, s, string, list, currentComb);
+    //add the instance to the linked list - in this case it is added at the end of the list
+    //the total number of shipments is incremented in the insert
+    insertLast(thisShip);
+	
+}
 }
 
 /**

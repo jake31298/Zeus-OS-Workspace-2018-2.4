@@ -75,7 +75,15 @@ public class TOPTruck
     setMainNodes(new TOPNodesLinkedList(tt, startDepX, startDepY, endDepX, endDepY, getTruckNum()));
   }
 
-  /**
+  public TOPTruck(TOPTruckType ttype, double xCoord, double yCoord) {
+	// TODO Auto-generated constructor stub
+}
+
+public TOPTruck(TOPTruckType ttype, double xCoord, double yCoord, int depotNum, double xCoord2, double yCoord2) {
+	// TODO Auto-generated constructor stub
+}
+
+/**
    * Returns the visit nodes linked list (route)
    * @return route
    */
