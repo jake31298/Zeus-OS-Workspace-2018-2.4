@@ -74,9 +74,9 @@ public class TOP {
     
     // ---------- TEMPORARY FIX --------------//
     
-    String dataFile = "data\\TOP" + 7 + ".xlsx";
+    String dataFile = "data\\TOP\\Problms\\PROB1-2-a.PRN.xlsx";
 	//String constraintFile = "\\TOP" + 7 + "." + 4 + "People.xlsx";
-    String constraintFile = "\\TOP\\PROB1-2-a.PRN.xlsx";
+    String constraintFile = "\\TOP\\Problems\\PROB1-2-a.PRN.xlsx";
 	String outFile = "TOP" + 7 + "." + 4 + "." + 't';
     
     dataFile = fileName;
@@ -91,9 +91,12 @@ public class TOP {
     //readShipmentsDataFromExcelFile(TOPProblemInfo.inputPath + dataFile, fileName, 0, 0, false);
     
     readShipmentsDataFromExcelFile(TOPProblemInfo.inputPath + dataFile, TOPProblemInfo.inputPath + constraintFile, 't', 4, false);
+    //Print output to console
+    
     
     Settings.printDebug(Settings.COMMENT, "Read Data File: " + TOPProblemInfo.inputPath + dataFile);
     writeDataFile(dataFile.substring(dataFile.lastIndexOf("/") + 1));
+    printDataToConsole();
 
     //Ensure that the shipment linked list has been loaded with the data
     if (mainShipments.getTOPHead() == null) {
@@ -198,9 +201,10 @@ public class TOP {
 
     //Only perform these steps if the GA is disabled. If it is enabled, these steps will
     //be performed at the very end by the GA class
+    
     if (TOPProblemInfo.enableGA == false) {
       //Run quality assurance on the solution
-      runQA();
+     // runQA(); Needs to come back later
 
       //Write the solution files
       writeLongSolutionToExcel(dataFile.substring(dataFile.lastIndexOf("/") + 1));
@@ -438,6 +442,7 @@ public class TOP {
 	 * @param truckCount
 	 * @param routeToOriginal
 	 */
+	@SuppressWarnings("deprecation")
 	public void readShipmentsDataFromExcelFile(String dataFile, String constraintFile, char constraint, int truckCount, boolean routeToOriginal) {
 		try {
 			int vehicleCount = 0;
@@ -458,7 +463,7 @@ public class TOP {
 			float D = 0;
 			//End Cortlin's Test
 			
-			Vector custTypes = new Vector();
+			Vector<Integer> custTypes = new Vector();
 			//Obtain the different customer types
 			for (int ct = 0; ct < 1; ct++) {
 				custTypes.add(new Integer(1));
@@ -472,57 +477,26 @@ public class TOP {
 			Row row = rowIt.next();
 			row = rowIt.next();
 			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
-			row = rowIt.next();
 			//System.out.println(row);
 
 		
-		
+			System.out.println("Before While Loop");
 			while ( rowIt.hasNext() )
 			{
+				System.out.println("While loop enter");
 				
 				try
 				{
 				row = rowIt.next();
 				
-				Cell cellA1 = row.getCell(0); //System.out.println(cellA1);
-				int i = (int)cellA1.getNumericCellValue(); System.out.println(i);
-				Cell cellB1 = row.getCell(1); //System.out.println(cellB1);
-				float  x = (float)cellB1.getNumericCellValue();
-				Cell cellC1 = row.getCell(2); //System.out.println(cellC1);
-				float y = (float)cellC1.getNumericCellValue();
-				Cell cellD1 = row.getCell(3); //System.out.println(cellD1);
-				int s = (int)cellD1.getNumericCellValue();
+				Cell cellA4 = row.getCell(0); //System.out.println(cellA1);
+				int i = (int)cellA4.getNumericCellValue(); System.out.println(i);
+				Cell cellB4 = row.getCell(1); //System.out.println(cellB1);
+				float  x = (float)cellB4.getNumericCellValue();
+				Cell cellC4 = row.getCell(2); //System.out.println(cellC1);
+				float y = (float)cellC4.getNumericCellValue();
+				Cell cellD4 = row.getCell(3); //System.out.println(cellD1);
+				int s = (int)cellD4.getNumericCellValue();
 				
 				
 				System.out.print(i + " " + x + " " + y + " " + s + "\n");
@@ -533,8 +507,7 @@ public class TOP {
 				Integer custType = (Integer) custTypes.elementAt(0);
 				if(i != 0 && s != 0) //May not need s check 
 				{
-					mainShipments.insertShipment(i, x, y, s, custType.toString(),
-							list, currentComb);		
+					mainShipments.insertShipment(i, x, y, s, custType.toString(),list, currentComb);		
 				}
 				else
 				{
@@ -995,6 +968,16 @@ public class TOP {
 	  }
   
 
+	public void printDataToConsole() {
+		//TOPShipmentLinkedList myShipments;
+		try {
+			mainShipments.printTOPShipmentsToConsole();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
   /**
    * Runs optmizations inserted into the mainOpts vector
    */

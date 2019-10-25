@@ -50,7 +50,7 @@ public class TOPRoot {
     TOPProblemInfo.gaMutationRate = 0.005;
 
     //Solve the problem(s)
-    runSingleProblem("PROB1-2-a.PRN.xlsx", true, true, true); //Problem 7-4-t, with GA, optimizations, and GUI enabled
+    runSingleProblem("PROB1-2-a.PRN.xlsx", true, false, true); //Problem 7-4-t, with GA, optimizations, and GUI enabled
     //runScriptFile("TOPScript.zsf");
   }
 

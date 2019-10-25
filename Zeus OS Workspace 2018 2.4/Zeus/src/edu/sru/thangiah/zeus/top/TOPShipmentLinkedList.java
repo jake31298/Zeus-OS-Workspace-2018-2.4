@@ -1,5 +1,6 @@
 package edu.sru.thangiah.zeus.top;
 
+import edu.sru.thangiah.zeus.core.Shipment;
 //import the parent class
 import edu.sru.thangiah.zeus.core.ShipmentLinkedList;
 import java.io.PrintStream;
@@ -185,6 +186,23 @@ public void insertShipment(int i, float x, float y, int s, String string, int[] 
     //the total number of shipments is incremented in the insert
     insertLast(thisShip);
 	
+}
+
+public void printTOPShipmentsToConsole() {
+	System.out.println(this.getNumShipments());
+
+	Shipment ship = super.getHead();
+	TOPShipment topShip;
+	while (ship != getTail())
+	{
+		topShip = (TOPShipment)ship ;
+		System.out.println(topShip.getIndex() + " " + topShip.getTruckTypeNeeded() + " " +
+				topShip.getDemand() + " " + topShip.getXCoord() + " " +
+				//ship.getYCoord() + " " + ship.getPickUpPointName() +
+				topShip.getYCoord() + " " +
+				topShip.getExtraVariable());
+		ship = ship.getNext();
+	}
 }
 }
 
@@ -717,6 +735,7 @@ class SmallestPolarAngleShortestDistToDepot
     }
     return foundShipment; //stub
   }
+
 
   //The WhoAmI methods gives the id of the assigned object
   //It is a static method so that it can be accessed without creating an object
