@@ -477,7 +477,7 @@ public class TOP {
 			Row row = rowIt.next();
 			row = rowIt.next();
 			row = rowIt.next();
-			//System.out.println(row);
+			System.out.println(row);
 
 		
 			System.out.println("Before While Loop");
