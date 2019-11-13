@@ -104,7 +104,7 @@ public class TOPRunOptPanel
 
     //set initial values for the optimization
     //jLabel13.setText(new Double(TOPProblemInfo.depotLLLevelCostF.getTotalConstraintCost(mainDepots)).toString());
-    jLabel14.setText(new Double(TOPProblemInfo.depotLLLevelCostF.getTotalDistance(mainDepots)).toString());
+    jLabel14.setText(new Double(TOPProblemInfo.getDepotLLLevelCostF().getTotalDistance(mainDepots)).toString());
     jLabel15.setText(new Integer(mainDepots.getTotalNumTrucksUsed()).toString());
     jLabel111.setText("Cost:");
     jLabel110.setText("Distance:");

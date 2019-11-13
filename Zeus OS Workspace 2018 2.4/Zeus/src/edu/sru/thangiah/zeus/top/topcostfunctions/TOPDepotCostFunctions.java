@@ -1,8 +1,10 @@
 package edu.sru.thangiah.zeus.top.topcostfunctions;
 
+import edu.sru.thangiah.zeus.core.*;
 import edu.sru.thangiah.zeus.top.TOPDepot;
+import edu.sru.thangiah.zeus.top.TOPDepotLinkedList;
 import edu.sru.thangiah.zeus.top.TOPProblemInfo;
-import edu.sru.thangiah.zeus.top.TOPDepot.*;
+import edu.sru.thangiah.zeus.top.TOPTruck;
 
 /**
  * Cost Functions specific to the TOP Depot level.
@@ -14,7 +16,6 @@ import edu.sru.thangiah.zeus.top.TOPDepot.*;
  * @version 2.0
 
  */
-
 public class TOPDepotCostFunctions
     extends TOPAbstractCostFunctions implements
     java.io.Serializable {
@@ -25,6 +26,27 @@ public class TOPDepotCostFunctions
 
     return depot.getAttributes().getTotalCost();
   }
+
+  /*public double getTotalConstraintCost(Object o) {
+    TOPDepot depot = (TOPDepot) o;
+    setTotalConstraintCost(o);
+
+    return depot.getAttributes().totalConstraintCost;
+     }*/
+
+  /*public double getTotalCrossRoadPenaltyCost(Object o) {
+    TOPDepot depot = (TOPDepot) o;
+    setTotalCrossRoadPenaltyCost(o);
+
+    return depot.getAttributes().totalCrossRoadPenaltyCost;
+     }*/
+
+  /*public double getTotalTurnAroundPenaltyCost(Object o) {
+    TOPDepot depot = (TOPDepot) o;
+    setTotalTurnAroundPenaltyCost(o);
+
+    return depot.getAttributes().totalTurnAroundPenaltyCost;
+     }*/
 
   public float getTotalDemand(Object o) {
     TOPDepot depot = (TOPDepot) o;
@@ -63,63 +85,56 @@ public class TOPDepotCostFunctions
 
   public void setTotalCost(Object o) {
     TOPDepot depot = (TOPDepot) o;
-    /*
-    depot.attributes.totalCost = TOPProblemInfo.truckLLLevelCostF.getTotalCost(
-        depot.getMainTrucks());
-        */
-    depot.getAttributes().setTotalCost(TOPProblemInfo.truckLLLevelCostF.getTotalCost(
-            depot.getMainTrucks()));
+    depot.getAttributes().setTotalCost(ZeusProblemInfo.getTruckLLLevelCostF().getTotalCost(
+        depot.getMainTrucks()));
   }
+
+  /*public void setTotalConstraintCost(Object o) {
+    TOPDepot depot = (TOPDepot) o;
+    depot.getAttributes().totalConstraintCost = ZeusProblemInfo.truckLLLevelCostF.
+        getTotalConstraintCost(depot.getMainTrucks());
+     }*/
+
+  /*public void setTotalCrossRoadPenaltyCost(Object o) {
+    TOPDepot depot = (TOPDepot) o;
+    depot.getAttributes().totalCrossRoadPenaltyCost = ZeusProblemInfo.truckLLLevelCostF.
+        getTotalCrossRoadPenaltyCost(depot.getMainTrucks());
+     }*/
+
+  /* public void setTotalTurnAroundPenaltyCost(Object o) {
+     TOPDepot depot = (TOPDepot) o;
+   depot.getAttributes().totalTurnAroundPenaltyCost = ZeusProblemInfo.truckLLLevelCostF.
+         getTotalTurnAroundPenaltyCost(depot.getMainTrucks());
+   }*/
 
   public void setTotalDemand(Object o) {
     TOPDepot depot = (TOPDepot) o;
-    /*
-    depot.getAttributes().totalDemand = (int) TOPProblemInfo.truckLLLevelCostF.
-        getTotalDemand(depot.getMainTrucks());
-        */
-    depot.getAttributes().setTotalDemand((int) TOPProblemInfo.truckLLLevelCostF.
-            getTotalDemand(depot.getMainTrucks()));
+    depot.getAttributes().setTotalDemand((int) ZeusProblemInfo.getTruckLLLevelCostF().
+        getTotalDemand(depot.getMainTrucks()));
   }
 
   public void setTotalDistance(Object o) {
     TOPDepot depot = (TOPDepot) o;
-    /*
-    depot.getAttributes().totalDistance = (float) TOPProblemInfo.truckLLLevelCostF.
-        getTotalDistance(depot.getMainTrucks());
-        */
-    depot.getAttributes().setTotalDistance((float) TOPProblemInfo.truckLLLevelCostF.
-            getTotalDistance(depot.getMainTrucks()));
-    
+    depot.getAttributes().setTotalDistance((float) ZeusProblemInfo.getTruckLLLevelCostF().
+        getTotalDistance(depot.getMainTrucks()));
   }
-
+  
   public void setTotalTravelTime(Object o) {
     TOPDepot depot = (TOPDepot) o;
-    /*
-    depot.getAttributes().totalTravelTime = TOPProblemInfo.truckLLLevelCostF.
-        getTotalTravelTime(depot.getMainTrucks());
-    */
-    depot.getAttributes().setTotalTravelTime(TOPProblemInfo.truckLLLevelCostF.
-            getTotalTravelTime(depot.getMainTrucks()));
+    depot.getAttributes().setTotalTravelTime( ZeusProblemInfo.getTruckLLLevelCostF().
+        getTotalTravelTime(depot.getMainTrucks()));
   }
 
   public void setMaxTravelTime(Object o) {
     TOPDepot depot = (TOPDepot) o;
-    /*
-    depot.getAttributes().maxTravelTime = TOPProblemInfo.truckLLLevelCostF.
-        getMaxTravelTime(depot.getMainTrucks());
-    */
-    depot.getAttributes().setMaxTravelTime(TOPProblemInfo.truckLLLevelCostF.
-            getMaxTravelTime(depot.getMainTrucks()));
+    depot.getAttributes().setMaxTravelTime(ZeusProblemInfo.getTruckLLLevelCostF().
+        getMaxTravelTime(depot.getMainTrucks()));
   }
 
   public void setAvgTravelTime(Object o) {
     TOPDepot depot = (TOPDepot) o;
-    /*
-    depot.getAttributes().avgTravelTime = TOPProblemInfo.truckLLLevelCostF.
-        getAvgTravelTime(depot.getMainTrucks());
-    */
-    depot.getAttributes().setAvgTravelTime(TOPProblemInfo.truckLLLevelCostF.
-            getAvgTravelTime(depot.getMainTrucks()));
+    depot.getAttributes().setAvgTravelTime(ZeusProblemInfo.getTruckLLLevelCostF().
+        getAvgTravelTime(depot.getMainTrucks()));
   }
 
   /** @todo Might not need CrossRoadPenaltyCost and TurnAroundPenaltyCost */
@@ -129,10 +144,12 @@ public class TOPDepotCostFunctions
     setTotalTravelTime(o);
     setMaxTravelTime(o);
     setAvgTravelTime(o);
+    //setTotalCrossRoadPenaltyCost(o);
+    // setTotalTurnAroundPenaltyCost(o);
     setTotalCost(o);
+    //setTotalConstraintCost(o);
   }
 
-//Added 1 OCT 2019
 @Override
 public int getTotalDays(Object arg0) {
 	// TODO Auto-generated method stub

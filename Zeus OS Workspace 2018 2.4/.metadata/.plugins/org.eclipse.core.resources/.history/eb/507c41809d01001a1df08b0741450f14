@@ -1,0 +1,201 @@
+package edu.sru.thangiah.zeus.top;
+
+import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
+import edu.sru.thangiah.zeus.top.topcostfunctions.TOPDepotLLCostFunctions;
+
+/**
+ * Holds global information about a TOP problem
+ * @author Peter Schallot
+ */
+public class TOPProblemInfo
+    extends ZeusProblemInfo {
+  /**
+   * Select the type of cost function to be used in TOPNodesLLCostFuntions.
+   * Used for changing the cost type for optimizations.
+   */
+  private enum TOPCostType {
+    SCORE_INVERSE, DISTANCE, DISTANCE_PLUS_SCORE_INVERSE, DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE
+  }
+
+  private static final long serialVersionUID = 1;
+
+  private static int truckMaxCapacity;                 //As all trucks have the same capacity, we only need to store it once.
+  private static float truckMaxTravelTime;             //Again, all trucks are the same, so they all have the same maximum travel time.
+  private static float startXCoord, startYCoord;       //Coords of the starting depot
+  private static float endXCoord, endYCoord;           //Coords of the ending depot
+  private static int numTeamMembers;                   //Number of trucks that will ultimately be used to calculate the score.
+
+  private static TOPCostType costType;                 //Determines which cost function is to be used
+  private static int numTargetAreas;                   //Number of elliptical target areas which will be generated
+  private static double targetPointDistanceFactor;     //Determines the distance between the foci of each target area
+  private static double targetEllipseSizeFactor;       //Determines the overall size of each elliptical target area
+  private static double maxDistanceBuffer;             //Percentage over the maximum travel distance that trucks will be allowed to go over before optimization
+  private static double overMaxDistanceCostPenalty;    //Penalty to the score of trucks which go over the maximum travel distance
+  private static double initialAngle;                  //Angle at which the first target area will be generated
+
+  private static String scriptFileLocation;            //Directory where Zeus Script Files will be placed
+  private static boolean enableGUI;                    //Controls whether the GUI is displayed after a solution is found
+  private static boolean enableOptimizations;          //Controls whether or not optimizations are used
+  private static boolean enableGA;                     //Controls whether or not genetic algorithms are used
+
+  private static int gaPopulationSize;                 //Population size of each GA generation
+  private static int gaNumGenerations;                 //Number of GA generations
+  private static int gaNumCrossoverPts;                //Number of GA crossover points
+  private static double gaCrossoverRate;               //Probability of a crossover in the GA
+  private static double gaMutationRate;                //Probability of a mutation in the GA
+
+  /**
+   * Constructor
+   */
+  public TOPProblemInfo() {
+  }
+
+  /**
+   * Returns the depot linked list cost function
+   * @return TOPDepotLLCostFunctions
+   */
+ public static TOPDepotLLCostFunctions getTOPDepotLLCostFunctions() {
+    return (TOPDepotLLCostFunctions)ZeusProblemInfo.getDepotLLLevelCostF();
+ }
+ 
+ public static int getGAPopulationSize() {
+	 return gaPopulationSize;
+ }
+ 
+ public static void setGAPopulationSize(int n) {
+	 gaPopulationSize = n;
+ }
+ 
+ public static int getGANumGenerations() {
+	 return gaNumGenerations;
+ }
+ 
+ public static int getGANumCrossoverPts() {
+	 return gaNumCrossoverPts;
+ }
+ 
+ public static double getGACrossoverRate() {
+	 return gaCrossoverRate;
+ }
+ 
+ public static double getGAMutationRate() {
+	 return gaMutationRate;
+ }
+
+public static void setNumTargetAreas(int t) {
+	numTargetAreas = t;	
+}
+
+public static int getNumTargetAreas() {
+	return numTargetAreas;
+}
+
+public static boolean getEnableGUI() {
+	return enableGUI;
+}
+
+public static void setOverMaxDistanceCostPenalty(double n) {
+	overMaxDistanceCostPenalty = n;
+}
+
+public static void setMaxDistanceBuffer(double n) {
+	maxDistanceBuffer = n;
+}
+
+public static double getOverMaxDistanceCostPenalty() {
+	return overMaxDistanceCostPenalty;
+}
+
+public static double getMaxDistanceBuffer() {
+	return maxDistanceBuffer;
+}
+
+public static float getStartXCoord() {
+	return startXCoord;
+}
+
+public static void setStartXCoord(float startXCoord) {
+	TOPProblemInfo.startXCoord = startXCoord;
+}
+
+public static float getEndXCoord() {
+	return endXCoord;
+}
+
+public static void setEndXCoord(float endXCoord) {
+	TOPProblemInfo.endXCoord = endXCoord;
+}
+
+public static float getTruckMaxTravelTime() {
+	return truckMaxTravelTime;
+}
+
+public static void setTruckMaxTravelTime(float truckMaxTravelTime) {
+	TOPProblemInfo.truckMaxTravelTime = truckMaxTravelTime;
+}
+
+public static float getStartYCoord() {
+	return startYCoord;
+}
+
+public static void setStartYCoord(float startYCoord) {
+	TOPProblemInfo.startYCoord = startYCoord;
+}
+
+public static float getEndYCoord() {
+	return endYCoord;
+}
+
+public static void setEndYCoord(float endYCoord) {
+	TOPProblemInfo.endYCoord = endYCoord;
+}
+
+public static boolean isEnableOptimizations() {
+	return enableOptimizations;
+}
+
+public static void setEnableOptimizations(boolean enableOptimizations) {
+	TOPProblemInfo.enableOptimizations = enableOptimizations;
+}
+
+public static double getTargetPointDistanceFactor() {
+	return targetPointDistanceFactor;
+}
+
+public static void setTargetPointDistanceFactor(double targetPointDistanceFactor) {
+	TOPProblemInfo.targetPointDistanceFactor = targetPointDistanceFactor;
+}
+
+public static double getTargetEllipseSizeFactor() {
+	return targetEllipseSizeFactor;
+}
+
+public static void setTargetEllipseSizeFactor(double targetEllipseSizeFactor) {
+	TOPProblemInfo.targetEllipseSizeFactor = targetEllipseSizeFactor;
+}
+
+public static double getInitialAngle() {
+	return initialAngle;
+}
+
+public static void setInitialAngle(double initialAngle) {
+	TOPProblemInfo.initialAngle = initialAngle;
+}
+
+public static int getNumTeamMembers() {
+	return numTeamMembers;
+}
+
+public static void setNumTeamMembers(int numTeamMembers) {
+	TOPProblemInfo.numTeamMembers = numTeamMembers;
+}
+
+public static boolean getEnableGA() {
+	return enableGA;
+}
+
+public static void setEnableGA(boolean enableGA) {
+	TOPProblemInfo.enableGA = enableGA;
+}
+
+}

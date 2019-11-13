@@ -128,7 +128,7 @@ public class TOPDepotFrame extends JInternalFrame {
             TOPTruck tempTruck = tempDepot.getTOPMainTrucks().getTOPHead();
 
             while (tempTruck != null) {
-                if ((tempTruck.isEmpty() == false) && (tempTruck.getIsTeamMember() == true)) {
+                if ((tempTruck.getIsUsed() == false) && (tempTruck.getIsTeamMember() == true)) {
                     DefaultMutableTreeNode tempTNode = new DefaultMutableTreeNode(tempTruck.toString());
                     TOPNodes point = tempTruck.getTOPMainNodes().getTOPHead();
 
@@ -158,7 +158,7 @@ public class TOPDepotFrame extends JInternalFrame {
             }
 
             root.add(tempDNode);
-            tempDepot = tempDepot.getTOPNext();
+            tempDepot = tempDepot.getNext();
         }
 
         JTree tree = new JTree(root);

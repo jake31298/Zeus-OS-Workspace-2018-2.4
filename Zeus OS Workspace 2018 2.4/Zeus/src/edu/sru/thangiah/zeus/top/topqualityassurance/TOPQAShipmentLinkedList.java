@@ -1,5 +1,6 @@
 package edu.sru.thangiah.zeus.top.topqualityassurance;
 
+import java.util.Vector;
 import edu.sru.thangiah.zeus.qualityassurance.*;
 
 /**
@@ -11,6 +12,7 @@ import edu.sru.thangiah.zeus.qualityassurance.*;
  * @author Sam R. Thangiah
  * @version 2.0
  */
+/** @todo Need to document the variables and the parameters */
 public class TOPQAShipmentLinkedList
     extends QAShipmentLinkedList
     implements java.io.Serializable, java.lang.Cloneable {
@@ -39,10 +41,10 @@ public class TOPQAShipmentLinkedList
     }
 
     boolean ret = true;
-    //loop through shipments and look for anomolies.  No shipment should be serviced more than once.
+    //loop through shipments and look for anomolies
     for (int l = 0; l < getShipments().size(); l++) {
       TOPQAShipment s = (TOPQAShipment) getShipments().elementAt(l);
-      if (s.getServecount() > 1) {
+      if (s.getServecount() > 1 || s.getServecount() < 0) {
         edu.sru.thangiah.zeus.core.Settings.printDebug(edu.sru.thangiah.zeus.
             core.Settings.ERROR,
             "Shipment " + s.getIndex() + " is serviced " + s.getServecount() + " time(s)");

@@ -1,8 +1,10 @@
 package edu.sru.thangiah.zeus.top.topcostfunctions;
 
 import edu.sru.thangiah.zeus.core.*;
+import edu.sru.thangiah.zeus.top.TOPDepot;
 import edu.sru.thangiah.zeus.top.TOPDepotLinkedList;
-import edu.sru.thangiah.zeus.top.*;
+import edu.sru.thangiah.zeus.top.TOPProblemInfo;
+import edu.sru.thangiah.zeus.top.TOPTruck;
 
 /**
  * Cost functions specific to Depot LinkedList level
@@ -13,347 +15,256 @@ import edu.sru.thangiah.zeus.top.*;
  * @author Sam R. Thangiah
  * @version 2.0
  */
-public class TOPDepotLLCostFunctions extends TOPAbstractCostFunctions implements java.io.Serializable {
+public class TOPDepotLLCostFunctions
+    extends TOPAbstractCostFunctions implements
+    java.io.Serializable {
 
   public double getTotalCost(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     setTotalCost(o);
 
-    return depotLL.getTOPAttributes().getTotalCost();
+    return depotLL.getAttributes().getTotalCost();
   }
+
+  /* public double getTotalConstraintCost(Object o) {
+     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
+     setTotalConstraintCost(o);
+
+     return depotLL.getAttributes().totalConstraintCost;
+   }*/
+
+  /*public double getTotalCrossRoadPenaltyCost(Object o) {
+    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
+    setTotalCrossRoadPenaltyCost(o);
+
+    return depotLL.getAttributes().totalCrossRoadPenaltyCost;
+     }*/
+
+  /*public double getTotalTurnAroundPenaltyCost(Object o) {
+    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
+    setTotalTurnAroundPenaltyCost(o);
+
+    return depotLL.getAttributes().totalTurnAroundPenaltyCost;
+     }*/
 
   public float getTotalDemand(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     setTotalDemand(o);
 
-    return (int)depotLL.getTOPAttributes().getTotalDemand();
+    return (int) depotLL.getAttributes().getTotalDemand();
   }
 
   public double getTotalDistance(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     setTotalDistance(o);
 
-    return depotLL.getTOPAttributes().getTotalDistance();
+    return depotLL.getAttributes().getTotalDistance();
   }
 
   public double getTotalTravelTime(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     setTotalTravelTime(o);
 
-    return depotLL.getTOPAttributes().getTotalTravelTime();
+    return depotLL.getAttributes().getTotalTravelTime();
   }
 
   public double getMaxTravelTime(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     setMaxTravelTime(o);
 
-    return depotLL.getTOPAttributes().getMaxTravelTime();
+    return depotLL.getAttributes().getMaxTravelTime();
   }
 
   public double getAvgTravelTime(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     setAvgTravelTime(o);
 
-    return depotLL.getTOPAttributes().getAvgTravelTime();
-  }
-
-  /**
-   * Returns the overall cost for the trucks that are team members
-   * @param o Object
-   * @return double
-   * Added by David Crissman
-   */
-  public double getTeamTotalCost(Object o) {
-    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPTruck currentTruck;
-    double teamTotalCost = 0.0;
-
-    //Set the cost of all trucks
-    setTotalCost(o);
-
-    //Find the highest-scoring trucks and mark them as team members
-    markTeamMembers(o);
-
-    //Look at each truck, and if it is a team member, add its cost
-    currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-    while (currentTruck != null) {
-      if (currentTruck.getIsTeamMember() == true) {
-        teamTotalCost += TOPProblemInfo.truckLevelCostF.getTotalCost(currentTruck);
-      }
-      currentTruck = currentTruck.getTOPNext();
-    }
-
-
-    return teamTotalCost;
-  }
-
-  /**
-   * Returns the overall demand for the trucks that are team members
-   * @param o Object
-   * @return float
-   * Added by David Crissman
-   */
-  public float getTeamTotalDemand(Object o) {
-    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPTruck currentTruck;
-    double teamTotalDemand = 0.0;
-
-    //Set the demand of all trucks
-    setTotalDemand(o);
-
-    //Find the highest-scoring trucks and mark them as team members
-    markTeamMembers(o);
-
-    //Look at each truck, and if it is a team member, add its demand
-    currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-    while (currentTruck != null) {
-      if (currentTruck.getIsTeamMember() == true) {
-	teamTotalDemand += TOPProblemInfo.truckLevelCostF.getTotalDemand(currentTruck);
-      }
-      currentTruck = currentTruck.getTOPNext();
-    }
-
-    return (int) teamTotalDemand;
-  }
-
-  /**
-   * Returns the total distance travelled by all the team members
-   * @param o Object
-   * @return double
-   * Added by David Crissman
-   */
-  public double getTeamTotalDistance(Object o) {
-    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPTruck currentTruck;
-    double teamTotalDistance = 0.0;
-
-    //Set the total distance of all the trucks
-    setTotalDistance(o);
-
-    //Find the highest-scoring trucks and mark them as team members
-    markTeamMembers(o);
-
-    //Look at each truck, and if it is a team member, add its demand
-    currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-    while (currentTruck != null) {
-      if (currentTruck.getIsTeamMember() == true) {
-        teamTotalDistance += TOPProblemInfo.truckLevelCostF.getTotalDistance(currentTruck);
-      }
-      currentTruck = currentTruck.getTOPNext();
-    }
-
-    return teamTotalDistance;
-  }
-
-  /**
-   * Returns the longest travel time of all the team members
-   * @param o Object
-   * @return double
-   * Added by David Crissman
-   */
-  public double getTeamMaxTravelTime(Object o) {
-    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPTruck currentTruck;
-    double teamMaxTravelTime = 0.0;
-
-    //Set the total travel time of all trucks
-    setTotalTravelTime(o);
-
-    //Find the highest-scoring trucks, and mark them as team members
-    markTeamMembers(o);
-
-    //Look at each truck, and pick out the highest travel time of all the team members
-    currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-    while (currentTruck != null) {
-      if (currentTruck.getIsTeamMember() == true) {
-        if (TOPProblemInfo.truckLevelCostF.getMaxTravelTime(currentTruck) > teamMaxTravelTime) {
-	  teamMaxTravelTime = TOPProblemInfo.truckLevelCostF.getMaxTravelTime(currentTruck);
-	}
-      }
-      currentTruck = currentTruck.getTOPNext();
-    }
-
-
-    return teamMaxTravelTime;
-  }
-
-  /**
-   * Returns the total travel time of all the team members
-   * @param o Object
-   * @return double
-   * Added by David Crissman
-   */
-  public double getTeamTotalTravelTime(Object o) {
-    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPTruck currentTruck;
-    double teamTotalTravelTime = 0.0;
-
-    //Set the total travel time of all the trucks
-    setTotalTravelTime(o);
-
-    //Find the highest-scoring trucks and mark them as team members
-    markTeamMembers(o);
-
-    //Look at each truck, and if it is a team member, add its travel time
-    currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-    while (currentTruck != null) {
-      if (currentTruck.getIsTeamMember() == true) {
-        teamTotalTravelTime += TOPProblemInfo.truckLevelCostF.getTotalTravelTime(currentTruck);
-      }
-      currentTruck = currentTruck.getTOPNext();
-    }
-
-
-    return teamTotalTravelTime;
-  }
-
-  /**
-   * Chooses the highest-scoring trucks and marks them as team members, up to the maximum number of team members
-   * @param o Object
-   * Added by David Crissman
-   */
-  public void markTeamMembers(Object o) {
-    TOPDepotLinkedList depotLL = (TOPDepotLinkedList)o;
-    TOPTruck currentTruck, bestTruck;
-    double currentDemand, bestDemand;
-
-    //Update the total demand for all the trucks
-    setTotalDemand(o);
-
-    //Clear the current team members so that they can be re-evaluated
-    currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-    while (currentTruck != null) {
-      currentTruck.setIsTeamMember(false);
-      currentTruck = currentTruck.getTOPNext();
-    }
-
-    for (int i = 0; i < TOPProblemInfo.numTeamMembers; i++) {
-      bestTruck = null;
-      bestDemand = 0.0;
-      currentTruck = depotLL.getStartDepot().getTOPMainTrucks().getTOPHead();
-      while (currentTruck != null) {
-        if (currentTruck.getIsTeamMember() == false) {
-          currentDemand = TOPProblemInfo.truckLevelCostF.getTotalDemand(currentTruck);
-          if (currentDemand > bestDemand) {
-            bestTruck = currentTruck;
-            bestDemand = currentDemand;
-          }
-        }
-        currentTruck = currentTruck.getTOPNext();
-      }
-
-      if (bestTruck != null) {
-        bestTruck.setIsTeamMember(true);
-      }
-    }
+    return depotLL.getAttributes().getAvgTravelTime();
   }
 
   public void setTotalCost(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
     double cost = 0;
 
-    TOPDepot d = depotLL.getTOPHead();
-    TOPDepot temp = d;
-    while (d != null) {
-      cost += TOPProblemInfo.depotLevelCostF.getTotalCost(d);
-      d = d.getTOPNext();
-      if(d == temp){
-        Settings.printDebug(Settings.COMMENT, "Possible error: TOPDepotLinkedList loops back on itself");
-        break;  // Get out because we're back to the original depot- Something could be wrong with the DepotLinkedList
-      }
+    Depot d = depotLL.getHead();
+
+    while (d != depotLL.getTail()) {
+      cost += ZeusProblemInfo.getDepotLevelCostF().getTotalCost(d);
+      d = d.getNext();
     }
 
-    depotLL.getTOPAttributes().totalCost = cost;
+    depotLL.getAttributes().setTotalCost(cost);
   }
+
+  /*public void setTotalConstraintCost(Object o) {
+    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
+    double cost = 0;
+
+    Depot d = depotLL.getHead();
+
+    while (d != depotLL.getTail()) {
+      cost += ZeusProblemInfo.depotLevelCostF.getTotalConstraintCost(d);
+      d = d.getNext();
+    }
+
+    depotLL.getAttributes().totalConstraintCost = cost;
+     }*/
+
+  /*public void setTotalCrossRoadPenaltyCost(Object o) {
+    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
+    depotLL.getAttributes().totalCrossRoadPenaltyCost = 0;
+
+    Depot d = depotLL.getHead();
+
+    while (d != depotLL.getTail()) {
+      depotLL.getAttributes().totalCrossRoadPenaltyCost += ZeusProblemInfo.
+          depotLevelCostF.getTotalCrossRoadPenaltyCost(d);
+      d = d.getNext();
+    }
+     }*/
+
+  /*public void setTotalTurnAroundPenaltyCost(Object o) {
+    TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
+    depotLL.getAttributes().totalTurnAroundPenaltyCost = 0;
+
+    Depot d = depotLL.getHead();
+
+    while (d != depotLL.getTail()) {
+      depotLL.getAttributes().totalTurnAroundPenaltyCost += ZeusProblemInfo.
+          depotLevelCostF.getTotalTurnAroundPenaltyCost(d);
+      d = d.getNext();
+    }
+     }*/
 
   public void setTotalDemand(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    depotLL.getTOPAttributes().totalDemand = 0;
+    depotLL.getAttributes().setTotalDemand(0);
 
-    TOPDepot d = depotLL.getTOPHead();
-    TOPDepot tempd = d;
+    Depot d = depotLL.getHead();
 
-    while (d != null) {
-      depotLL.getTOPAttributes().totalDemand += (float) TOPProblemInfo.depotLevelCostF.getTotalDemand(d);
-      d = d.getTOPNext();
-      if(d == tempd){
-        break; // Break if the list loops back on itself instead of ending in a null.
-      }
+    while (d != depotLL.getTail()) {
+      depotLL.getAttributes().setTotalDemand(depotLL.getAttributes().getTotalDemand() + (float) ZeusProblemInfo.getDepotLevelCostF().
+          getTotalDemand(d));
+      d = d.getNext();
     }
   }
+ 
+	/**
+	   * Chooses the highest-scoring trucks and marks them as team members, up to the maximum number of team members
+	   * @param o Object
+	   * Added by David Crissman
+	   */
+	  public void markTeamMembers(Object o) {
+	    TOPDepotLinkedList depotLL = (TOPDepotLinkedList)o;
+	    TOPTruck currentTruck, bestTruck;
+	    double currentDemand, bestDemand;
 
+	    //Update the total demand for all the trucks
+	    setTotalDemand(o);
+
+	    //Clear the current team members so that they can be re-evaluated
+	    currentTruck = depotLL.getStartingDepot().getMainTrucks().getHead();
+	    while (currentTruck != null) {
+	      currentTruck.setIsTeamMember(false);
+	      currentTruck = currentTruck.getTOPNext();
+	    }
+
+	    for (int i = 0; i < TOPProblemInfo.getNumTeamMembers(); i++) {
+	      bestTruck = null;
+	      bestDemand = 0.0;
+	      currentTruck = depotLL.getStartingDepot().getMainTrucks().getHead();
+	      while (currentTruck != null) {
+	        if (currentTruck.getIsTeamMember() == false) {
+	          currentDemand = TOPProblemInfo.getTruckLevelCostF().getTotalDemand(currentTruck);
+	          if (currentDemand > bestDemand) {
+	            bestTruck = currentTruck;
+	            bestDemand = currentDemand;
+	          }
+	        }
+	        currentTruck = currentTruck.getTOPNext();
+	      }
+
+	      if (bestTruck != null) {
+	        bestTruck.setIsTeamMember(true);
+	      }
+	    }
+	  }
   public void setTotalDistance(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    depotLL.getTOPAttributes().totalDistance = 0;
+    depotLL.getAttributes().setTotalDistance(0);
 
-    TOPDepot d = depotLL.getTOPHead();
+    Depot d = depotLL.getHead();
 
-    while (d != null) {
-      depotLL.getTOPAttributes().totalDistance += (float) TOPProblemInfo.depotLevelCostF.getTotalDistance(d);
-      d = d.getTOPNext();
+    while (d != depotLL.getTail()) {
+      depotLL.getAttributes().setTotalDistance(depotLL.getAttributes().getTotalDistance()  + (float) ZeusProblemInfo.getDepotLevelCostF().
+          getTotalDistance(d));
+      d = d.getNext();
     }
   }
 
   public void setTotalTravelTime(Object o) {
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    depotLL.getTOPAttributes().totalTravelTime = 0;
+     depotLL.getAttributes().setTotalTravelTime(0);
 
-    TOPDepot d = depotLL.getTOPHead();
+    Depot d = depotLL.getHead();
 
-    while (d != null) {
-      depotLL.getTOPAttributes().totalTravelTime += TOPProblemInfo.depotLevelCostF.
-          getTotalTravelTime(d);
-      d = d.getTOPNext();
+    while (d != depotLL.getTail()) {
+      depotLL.getAttributes().setTotalTravelTime(depotLL.getAttributes().getTotalTravelTime() + ZeusProblemInfo.getDepotLevelCostF().
+          getTotalTravelTime(d));
+      d = d.getNext();
     }
   }
 
   public void setMaxTravelTime(Object o) {
     double max = 0;
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPDepot d = depotLL.getTOPHead();
+    Depot d = depotLL.getHead();
 
-    while (d != null) {
-      if (TOPProblemInfo.depotLevelCostF.getMaxTravelTime(d) > max) {
-        max = TOPProblemInfo.depotLevelCostF.getMaxTravelTime(d);
+    while (d != depotLL.getTail()) {
+      if (ZeusProblemInfo.getDepotLevelCostF().getMaxTravelTime(d) > max) {
+        max = ZeusProblemInfo.getDepotLevelCostF().getMaxTravelTime(d);
       }
 
-      d = d.getTOPNext();
+      d = d.getNext();
     }
 
-    depotLL.getTOPAttributes().maxTravelTime = max;
+    depotLL.getAttributes().setMaxTravelTime(max);
   }
 
   public void setAvgTravelTime(Object o) {
     double avg = 0;
     TOPDepotLinkedList depotLL = (TOPDepotLinkedList) o;
-    TOPDepot d = depotLL.getTOPHead();
+    Depot d = depotLL.getHead();
 
-    if (TOPProblemInfo.depotLLLevelCostF.getTotalDemand(depotLL) != 0) {
-      while (d != null) {
+    if (ZeusProblemInfo.getDepotLLLevelCostF().getTotalDemand(depotLL) != 0) {
+      while (d != depotLL.getTail()) {
         avg +=
-            (TOPProblemInfo.depotLevelCostF.getAvgTravelTime(d) *
-            		TOPProblemInfo.depotLevelCostF.getTotalDemand(d));
-        d = d.getTOPNext();
+            (ZeusProblemInfo.getDepotLevelCostF().getAvgTravelTime(d) *
+             ZeusProblemInfo.getDepotLevelCostF().getTotalDemand(d));
+        d = d.getNext();
       }
 
-      depotLL.getTOPAttributes().avgTravelTime = avg /
-      TOPProblemInfo.depotLLLevelCostF.getTotalDemand(depotLL);
+      depotLL.getAttributes().setAvgTravelTime(avg /
+          ZeusProblemInfo.getDepotLLLevelCostF().getTotalDemand(depotLL));
     }
     else {
-      depotLL.getTOPAttributes().avgTravelTime = 0;
+      depotLL.getAttributes().setAvgTravelTime(0);
     }
   }
 
+  /** @todo Might not need CrossRoadPenaltyCost and TurnAroundPenaltyCost */
   public void calculateTotalsStats(Object o) {
     setTotalDemand(o);
     setTotalDistance(o);
     setTotalTravelTime(o);
     setMaxTravelTime(o);
     setAvgTravelTime(o);
+    //setTotalCrossRoadPenaltyCost(o);
+    //setTotalTurnAroundPenaltyCost(o);
     setTotalCost(o);
+    //setTotalConstraintCost(o);
   }
 
-  //Added 1 OCT 2019
 @Override
 public int getTotalDays(Object arg0) {
 	// TODO Auto-generated method stub

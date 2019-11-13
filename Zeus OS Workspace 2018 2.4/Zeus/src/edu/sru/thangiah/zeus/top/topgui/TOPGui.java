@@ -105,7 +105,7 @@ public class TOPGui
     desktop.add(shipmentFrame);
 
       //create the info frame and place it in the display
-      infoFrame = new TOPInfoFrame(TOPGuiInfo.mainDepots.getTeamSolutionString());
+      infoFrame = new TOPInfoFrame(TOPGuiInfo.mainDepots.getSolutionString());
       infoFrame.setVisible(TOPGuiInfo.showInfoPane);
       infoFrame.setBounds(this.getWidth() - infoFrame.getWidth(), 0,
                           infoFrame.getWidth(), infoFrame.getHeight());

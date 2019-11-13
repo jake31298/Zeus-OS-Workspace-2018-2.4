@@ -18,7 +18,7 @@ public class TOPQADepot
   public TOPQADepot() {
   }
 
-  public boolean checkDistanceConstraint() {
+  public boolean checkDistanceConstraint(TOPQADepot depot) {
     boolean status = true;
     for (int i = 0; i < getTrucks().size(); i++) {
       TOPQATruck truck = (TOPQATruck) getTrucks().elementAt(i);

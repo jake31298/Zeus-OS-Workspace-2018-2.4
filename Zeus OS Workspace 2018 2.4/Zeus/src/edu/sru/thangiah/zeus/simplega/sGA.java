@@ -33,402 +33,400 @@ import edu.sru.thangiah.zeus.top.TOP;
 import edu.sru.thangiah.zeus.top.TOPProblemInfo;
 
 public class sGA {
-  public String problemFile;
+	public String problemFile;
 
-  public TOP theTop;
-  private static int populationSize = TOPProblemInfo.gaPopulationSize;
-  private static int maxGenerations = TOPProblemInfo.gaNumGenerations;
-  private static int numXoverPoints = TOPProblemInfo.gaNumCrossoverPts;
-  private static double crossoverRate = TOPProblemInfo.gaCrossoverRate;
-  private static double mutationRate = TOPProblemInfo.gaMutationRate;
-  private static boolean doElitism = true;
+	public TOP theTop;
+	private static int populationSize = TOPProblemInfo.getGAPopulationSize();
+	private static int maxGenerations = TOPProblemInfo.getGANumGenerations();
+	private static int numXoverPoints = TOPProblemInfo.getGANumCrossoverPts();
+	private static double crossoverRate = TOPProblemInfo.getGACrossoverRate();
+	private static double mutationRate = TOPProblemInfo.getGAMutationRate();
+	private static boolean doElitism = true;
 
-  private static int printPerGens   = 5; // print every this often
-  private static String logFileName = null;
+	private static int printPerGens = 5; // print every this often
+	private static String logFileName = null;
 
-   // record the time the program started
-   private static final long  startTime      = System.currentTimeMillis();
+	// record the time the program started
+	private static final long startTime = System.currentTimeMillis();
 
-   private final Chromosome theBest = new MyChromosome(problemFile, this);
-   private int theBestGeneration; // generation theBest first showed up
-   // 0..popSize-1 holds population and theBest holds the most fit
-   private Chromosome[] population    = new Chromosome[populationSize];
-   private Chromosome[] newPopulation = new Chromosome[populationSize];
+	private final Chromosome theBest = new MyChromosome(problemFile, this);
+	private int theBestGeneration; // generation theBest first showed up
+	// 0..popSize-1 holds population and theBest holds the most fit
+	private Chromosome[] population = new Chromosome[populationSize];
+	private Chromosome[] newPopulation = new Chromosome[populationSize];
 
-   private int generationNum;     // current generation number
-   private int numCrossovers, numMutations;  // tabulate for report()
+	private int generationNum; // current generation number
+	private int numCrossovers, numMutations; // tabulate for report()
 
-   private Selection theSelection = null;
-   private Crossover theCrossover = null;
+	private Selection theSelection = null;
+	private Crossover theCrossover = null;
 
-   /**
-    * Constructor
-    * @param fileName String
-    */
-   public sGA(String fileName) {
-     super();
+	/**
+	 * Constructor
+	 * 
+	 * @param fileName String
+	 */
+	public sGA(String fileName) {
+		super();
 
-     TOPchromosome.bestAnswer = 0;
-     problemFile = fileName;
-     System.out.println(fileName + " = filename");
-     theTop = null;
+		TOPchromosome.bestAnswer = 0;
+		problemFile = fileName;
+		System.out.println(fileName + " = filename");
+		theTop = null;
 
-     mainLoop();
-   }
-
-   /**
-    * Returns how long this class has been running
-    * @return long
-    */
-   private static long getAge() {
-      return System.currentTimeMillis() - startTime;
-   }
-
-   /**
-    * Returns the best TOP solution so far for this problem
-    * @return TOP
-    */
-   public TOP getBestTOP(){
-     return theTop;
-   }
-
-   /**
-    * Compare the current TOP with the best recorded TOP, and save if the
-    * score is higher.
-    * @param theTop TOP
-    */
-   public void compareToBest(TOP theTop){
-     if(this.theTop == null){
-       this.theTop = theTop;
-     }
-     else{
-       double prevBestScore = this.theTop.getTotalScore();
-       double currentScore = theTop.getTotalScore();
-       if(currentScore > prevBestScore){
-         this.theTop = theTop;
-       }
-     }
-   }
-
-   private void printChromosome(String name, Chromosome c) {
-      Globals.stdout.println(name +
-        ":\n   " + c.toGenotype() +
-         "\n   " + c.toPhenotype() +
-         "\n    fitness= " + c.getFitness());
-   }
-
-   public void mainLoop() {
-      Globals.stdout.println("GA: mainLoop");
-      if (Chromosome.isSolutionFitnessKnown()) {
-         Globals.stdout.println("Known solution fitness is " +
-            Chromosome.getSolutionFitness());
-      }
-      initialize();
-      findTheBest();
-      report("Initial population");
-      while (!terminated()) {
-        generationNum++;
-        try {
-          theSelection.select(population, newPopulation, populationSize);
-          swapPopulationArrays();
-        }
-        catch (FitnessSumZeroException e) {
-          // replace current population with a new random one;
-          // other possibilities are to do nothing and hope mutation
-          // fixes the problem eventually
-          if (Debug.flag) {
-	    Globals.stdout.println(e + " (randomizing)");
-	  }
-
-          for (int i = 0; i < populationSize; i++) {
-            population[i].initializeChromosomeRandom();
-          }
-        }
-        catch (SelectionException e) {
-          if (Debug.flag) {
-	    Globals.stdout.println(e);
-	  }
-        }
-        if (Debug.flag) {
-	  report("Selection");
+		mainLoop();
 	}
 
-        crossover();
-        if (Debug.flag) {
-	  report("Crossover");
+	/**
+	 * Returns how long this class has been running
+	 * 
+	 * @return long
+	 */
+	private static long getAge() {
+		return System.currentTimeMillis() - startTime;
 	}
 
-        mutate();
-        if (Debug.flag) {
-	  report("Mutation");
+	/**
+	 * Returns the best TOP solution so far for this problem
+	 * 
+	 * @return TOP
+	 */
+	public TOP getBestTOP() {
+		return theTop;
 	}
 
-        if (doElitism) {
-	  elitism();
+	/**
+	 * Compare the current TOP with the best recorded TOP, and save if the score is
+	 * higher.
+	 * 
+	 * @param theTop TOP
+	 *//*
+	public void compareToBest(TOP theTop) {
+		if (this.theTop == null) {
+			this.theTop = theTop;
+		} else {
+			double prevBestScore = this.theTop.getTotalScore();
+			double currentScore = theTop.getTotalScore();
+			if (currentScore > prevBestScore) {
+				this.theTop = theTop;
+			}
+		}
 	}
-        else {
-	  justUpdateTheBest();
+*/
+	private void printChromosome(String name, Chromosome c) {
+		Globals.stdout.println(
+				name + ":\n   " + c.toGenotype() + "\n   " + c.toPhenotype() + "\n    fitness= " + c.getFitness());
 	}
 
-        if (Debug.flag || (generationNum % printPerGens) == 0) {
-          report("Report");
-        }
-      }
+	public void mainLoop() {
+		Globals.stdout.println("GA: mainLoop");
+		if (Chromosome.isSolutionFitnessKnown()) {
+			Globals.stdout.println("Known solution fitness is " + Chromosome.getSolutionFitness());
+		}
+		initialize();
+		findTheBest();
+		report("Initial population");
+		while (!terminated()) {
+			generationNum++;
+			try {
+				theSelection.select(population, newPopulation, populationSize);
+				swapPopulationArrays();
+			} catch (FitnessSumZeroException e) {
+				// replace current population with a new random one;
+				// other possibilities are to do nothing and hope mutation
+				// fixes the problem eventually
+				if (Debug.flag) {
+					Globals.stdout.println(e + " (randomizing)");
+				}
 
-      Globals.stdout.println("Simulation completed in " + generationNum +
-         " generations and " + getAge()/1000.0 + " seconds");
-      printChromosome("Best member (generation="+theBestGeneration+")",
-         theBest);
+				for (int i = 0; i < populationSize; i++) {
+					population[i].initializeChromosomeRandom();
+				}
+			} catch (SelectionException e) {
+				if (Debug.flag) {
+					Globals.stdout.println(e);
+				}
+			}
+			if (Debug.flag) {
+				report("Selection");
+			}
 
-      System.out.println(theBest.parametersToString());
+			crossover();
+			if (Debug.flag) {
+				report("Crossover");
+			}
 
-      try {
-        BufferedWriter out = new BufferedWriter(new FileWriter("GAResults.txt", true));
-        out.write(theBest.parametersToString());
-        out.close();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
+			mutate();
+			if (Debug.flag) {
+				report("Mutation");
+			}
 
-      //Run the quality assurance package on the best solution
-      theTop.runQA();
+			if (doElitism) {
+				elitism();
+			} else {
+				justUpdateTheBest();
+			}
 
-      //Record the best solution to solution files
-      theTop.writeAllSolutionFiles();
+			if (Debug.flag || (generationNum % printPerGens) == 0) {
+				report("Report");
+			}
+		}
 
-      //Display the GUI of the best solution
-      if (TOPProblemInfo.enableGUI == true) {
-	theTop.displayGUI();
-      }
-   }
+		Globals.stdout.println(
+				"Simulation completed in " + generationNum + " generations and " + getAge() / 1000.0 + " seconds");
+		printChromosome("Best member (generation=" + theBestGeneration + ")", theBest);
 
-   private void initialize() {
-      generationNum = 0;
-      numCrossovers = 0;
-      numMutations = 0;
+		System.out.println(theBest.parametersToString());
 
-      theSelection = new ProportionalSelection();
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("GAResults.txt", true));
+			out.write(theBest.parametersToString());
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-      if (numXoverPoints == 0) theCrossover = new UniformCrossover();
-      else if (numXoverPoints == 1) theCrossover = new OnePointCrossover();
-      else theCrossover = new NPointCrossover(numXoverPoints);
+		// Run the quality assurance package on the best solution
+		//theTop.runQA();
 
-      for (int j = 0; j < populationSize; j++) {
-         population[j] = new MyChromosome(problemFile,this);
-         population[j].initializeChromosomeRandom();
-         newPopulation[j] = new MyChromosome(problemFile,this);
-      }
+		theTop.writeAllSolutionFiles();
 
-      if (Debug.flag) {
-         for (int j=0; j<populationSize; j++) {
-            printChromosome("p" + j, population[j]);
-         }
-      }
-   }
+		// Display the GUI of the best solution
+		if (TOPProblemInfo.getEnableGUI() == true) {
+			//theTop.displayGUI();
+		}
+	}
 
-   private void findTheBest() {  // called on the initial population only
-      double currentBestFitness = population[0].getFitness();
-      double next = -1;
-      int currentBest = 0; // index of the current best individual
+	private void initialize() {
+		generationNum = 0;
+		numCrossovers = 0;
+		numMutations = 0;
 
-      for (int j = 1; j < populationSize; j++) {
-         if ((next = population[j].getFitness()) > currentBestFitness ) {
-            currentBest = j;
-            currentBestFitness = next;
-         }
-      }
-      // once the best member in the population is found, copy the genes
-      population[currentBest].copyChromosome(theBest);
+		theSelection = new ProportionalSelection();
 
-      if (Debug.flag) {
-          printChromosome("currentBest (generation="+theBestGeneration+")",
-             theBest);
-      }
-   }
+		if (numXoverPoints == 0)
+			theCrossover = new UniformCrossover();
+		else if (numXoverPoints == 1)
+			theCrossover = new OnePointCrossover();
+		else
+			theCrossover = new NPointCrossover(numXoverPoints);
 
-   private boolean terminated() {
-      return (theBest.isSolutionFitnessKnown() &&
-              theBest.getFitness() == theBest.getSolutionFitness()) ||
-             generationNum >= maxGenerations;
-   }
+		for (int j = 0; j < populationSize; j++) {
+			population[j] = new MyChromosome(problemFile, this);
+			population[j].initializeChromosomeRandom();
+			newPopulation[j] = new MyChromosome(problemFile, this);
+		}
 
-   private void swapPopulationArrays() {
-      Chromosome[] temp = population;
-      population = newPopulation;
-      newPopulation = temp;
-   }
+		if (Debug.flag) {
+			for (int j = 0; j < populationSize; j++) {
+				printChromosome("p" + j, population[j]);
+			}
+		}
+	}
 
-   /***************************************************************/
-   /* Crossover selection: selects two parents that take part in  */
-   /* the crossover.  For each population member, flip a weighted */
-   /* coin.  Every two times it comes up < crossoverRate, then    */
-   /* crossover those two chromosomes.                            */
-   /***************************************************************/
-   private void crossover() {
-      int one = -1;    // compiler complains not being initialized
-      int first  =  0; // count of the number of members chosen
+	private void findTheBest() { // called on the initial population only
+		double currentBestFitness = population[0].getFitness();
+		double next = -1;
+		int currentBest = 0; // index of the current best individual
 
-      for (int mem = 0; mem < populationSize; ++mem) {
-         if (MyRandom.dblRandom() < crossoverRate) {
-            ++first;
-            if (first % 2 == 0) {
-               numCrossovers++;
-               if (Debug.flag) {
-                  Globals.stdout.println("crossing " + one + " and " + mem);
-               }
-               theCrossover.xOver(population[one], population[mem]);
-            } else one = mem;
-         }
-      }
-   }
+		for (int j = 1; j < populationSize; j++) {
+			if ((next = population[j].getFitness()) > currentBestFitness) {
+				currentBest = j;
+				currentBestFitness = next;
+			}
+		}
+		// once the best member in the population is found, copy the genes
+		population[currentBest].copyChromosome(theBest);
 
-   /**************************************************************/
-   /* Mutation: Random uniform mutation. A variable selected for */
-   /* mutation is replaced by a random value between lower and   */
-   /* upper bounds of this variable                              */
-   /**************************************************************/
-   private void mutate() {
-      int chromosomeLength = Chromosome.getChromosomeLength();
-      for (int i = 0; i < populationSize; i++) {
-         for (int j = 0; j < chromosomeLength; j++) {
-            if (MyRandom.dblRandom() < mutationRate) {
-               numMutations++;
-               population[i].mutateGene(j);
-               if (Debug.flag) {
-                  printChromosome("mutation, i=" + i + ", gene=" + j,
-                     population[i]);
-               }
-            }
-         }
-      }
-   }
+		if (Debug.flag) {
+			printChromosome("currentBest (generation=" + theBestGeneration + ")", theBest);
+		}
+	}
 
-   /***************************************************************/
-   /* Report function: Reports progress of the simulation.
-   /***************************************************************/
-   private void report(String title) {
-      double best_val;            // best fitness in this population
-      double most_fit;            // most fit seen in previous generations
-      double avg;                 // avg population fitness
-      double stddev;              // std. deviation of population fitness
-      double sum_square;          // sum of square for std. calc
-      double square_sum;          // square of sum for std. calc
-      double sum;                 // total population fitness
-      double fitness;
+	private boolean terminated() {
+		return (theBest.isSolutionFitnessKnown() && theBest.getFitness() == theBest.getSolutionFitness())
+				|| generationNum >= maxGenerations;
+	}
 
-      sum = 0.0;
-      sum_square = 0.0;
-      best_val = -1.0;
+	private void swapPopulationArrays() {
+		Chromosome[] temp = population;
+		population = newPopulation;
+		newPopulation = temp;
+	}
 
-      for (int i = 0; i < populationSize; i++) {
-         fitness = population[i].getFitness();
-         sum += fitness;
-         sum_square += fitness * fitness;
-         if (fitness > best_val) best_val = fitness;
-      }
+	/***************************************************************/
+	/* Crossover selection: selects two parents that take part in */
+	/* the crossover. For each population member, flip a weighted */
+	/* coin. Every two times it comes up < crossoverRate, then */
+	/* crossover those two chromosomes. */
+	/***************************************************************/
+	private void crossover() {
+		int one = -1; // compiler complains not being initialized
+		int first = 0; // count of the number of members chosen
 
-      avg = sum/(double)populationSize;
-      square_sum = sum * sum/(double)populationSize;
-      stddev = Math.sqrt((1.0/(double)(populationSize - 1))
-         *(sum_square - square_sum));
-      most_fit = theBest.getFitness();
+		for (int mem = 0; mem < populationSize; ++mem) {
+			if (MyRandom.dblRandom() < crossoverRate) {
+				++first;
+				if (first % 2 == 0) {
+					numCrossovers++;
+					if (Debug.flag) {
+						Globals.stdout.println("crossing " + one + " and " + mem);
+					}
+					theCrossover.xOver(population[one], population[mem]);
+				} else
+					one = mem;
+			}
+		}
+	}
 
-      Globals.stdout.println(title + ": generation=" + generationNum
-         + " best value=" + best_val + " avg=" + avg + " stddev=" + stddev);
-      printChromosome("most fit (previous generation=" + theBestGeneration
-         + ")", theBest);
+	/**************************************************************/
+	/* Mutation: Random uniform mutation. A variable selected for */
+	/* mutation is replaced by a random value between lower and */
+	/* upper bounds of this variable */
+	/**************************************************************/
+	private void mutate() {
+		int chromosomeLength = Chromosome.getChromosomeLength();
+		for (int i = 0; i < populationSize; i++) {
+			for (int j = 0; j < chromosomeLength; j++) {
+				if (MyRandom.dblRandom() < mutationRate) {
+					numMutations++;
+					population[i].mutateGene(j);
+					if (Debug.flag) {
+						printChromosome("mutation, i=" + i + ", gene=" + j, population[i]);
+					}
+				}
+			}
+		}
+	}
 
+	/***************************************************************/
+	/*
+	 * Report function: Reports progress of the simulation. /
+	 ***************************************************************/
+	private void report(String title) {
+		double best_val; // best fitness in this population
+		double most_fit; // most fit seen in previous generations
+		double avg; // avg population fitness
+		double stddev; // std. deviation of population fitness
+		double sum_square; // sum of square for std. calc
+		double square_sum; // square of sum for std. calc
+		double sum; // total population fitness
+		double fitness;
 
-      Globals.stdout.println("number of crossovers and mutations: "
-         + numCrossovers + " and " + numMutations);
+		sum = 0.0;
+		sum_square = 0.0;
+		best_val = -1.0;
 
-      if (Debug.flag) {
-         for (int j=0; j<populationSize; j++) {
-            printChromosome("p" + j, population[j]);
-         }
-      }
-      Globals.stdout.flush();
-   }
+		for (int i = 0; i < populationSize; i++) {
+			fitness = population[i].getFitness();
+			sum += fitness;
+			sum_square += fitness * fitness;
+			if (fitness > best_val)
+				best_val = fitness;
+		}
 
-   /****************************************************************/
-   /* Elitist function: The best member of the previous generation */
-   /* is stored in theBest Chromosome.  If the best member of      */
-   /* the current generation is worse then the best member of the  */
-   /* previous generation, the latter one would replace the worst  */
-   /* member of the current population                             */
-   /****************************************************************/
-   private void elitism() {
+		avg = sum / (double) populationSize;
+		square_sum = sum * sum / (double) populationSize;
+		stddev = Math.sqrt((1.0 / (double) (populationSize - 1)) * (sum_square - square_sum));
+		most_fit = theBest.getFitness();
 
-      double best, worst;          // best and worst fitness values
-      int bestMember, worstMember; // indexes of the best and worst member
-      int start; // index used to start the loop
+		Globals.stdout.println(title + ": generation=" + generationNum + " best value=" + best_val + " avg=" + avg
+				+ " stddev=" + stddev);
+		printChromosome("most fit (previous generation=" + theBestGeneration + ")", theBest);
 
-      if (populationSize % 2 == 0) {
-         best = -1; bestMember = -1;
-         worst = Double.MAX_VALUE; worstMember = -1;
-         start = 0;
-      } else {
-         best  = population[0].getFitness(); bestMember = 0;
-         worst = population[0].getFitness(); worstMember = 0;
-         start = 1;
-      }
+		Globals.stdout.println("number of crossovers and mutations: " + numCrossovers + " and " + numMutations);
 
-      for (int i = start; i < populationSize - 1; i+=2) {
-         if (population[i].getFitness() > population[i+1].getFitness()) {
-            if (population[i].getFitness() > best) {
-               best = population[i].getFitness(); bestMember = i;
-            }
-            if (population[i+1].getFitness() < worst) {
-               worst = population[i+1].getFitness(); worstMember = i + 1;
-            }
-         } else {
-            if (population[i].getFitness() < worst) {
-               worst = population[i].getFitness(); worstMember = i;
-            }
-            if (population[i+1].getFitness() > best) {
-               best = population[i+1].getFitness(); bestMember = i + 1;
-            }
-         }
-      }
-      // if best individual from the new population is better than
-      // the best individual from the previous population, then
-      // copy the best from the new population; else replace the
-      // worst individual from the current population with the
-      // best one from the previous generation
-      if (best > theBest.getFitness()) {
-         population[bestMember].copyChromosome(theBest);
-         theBestGeneration = generationNum;
-      } else {
-         theBest.copyChromosome(population[worstMember]);
-      }
+		if (Debug.flag) {
+			for (int j = 0; j < populationSize; j++) {
+				printChromosome("p" + j, population[j]);
+			}
+		}
+		Globals.stdout.flush();
+	}
 
-      if (Debug.flag) {
-         printChromosome("elitism, best (index="+bestMember+")",
-            population[bestMember]);
-         printChromosome("elitism, worst (index="+worstMember+")",
-            population[worstMember]);
-      }
-   }
+	/****************************************************************/
+	/* Elitist function: The best member of the previous generation */
+	/* is stored in theBest Chromosome. If the best member of */
+	/* the current generation is worse then the best member of the */
+	/* previous generation, the latter one would replace the worst */
+	/* member of the current population */
+	/****************************************************************/
+	private void elitism() {
 
-   private void justUpdateTheBest() {
-      double currentBestFitness = population[0].getFitness();
-      double next = -1;
-      int currentBest = 0; // index of the current best individual
+		double best, worst; // best and worst fitness values
+		int bestMember, worstMember; // indexes of the best and worst member
+		int start; // index used to start the loop
 
-      for (int j = 1; j < populationSize; j++) {
-         if ((next = population[j].getFitness()) > currentBestFitness ) {
-            currentBest = j;
-            currentBestFitness = next;
-         }
-      }
-      if (currentBestFitness > theBest.getFitness()) {
-         population[currentBest].copyChromosome(theBest);
-         theBestGeneration = generationNum;
-      }
-      if (Debug.flag) {
-          printChromosome("theBest (generation="+theBestGeneration+")",
-             theBest);
-      }
-   }
+		if (populationSize % 2 == 0) {
+			best = -1;
+			bestMember = -1;
+			worst = Double.MAX_VALUE;
+			worstMember = -1;
+			start = 0;
+		} else {
+			best = population[0].getFitness();
+			bestMember = 0;
+			worst = population[0].getFitness();
+			worstMember = 0;
+			start = 1;
+		}
+
+		for (int i = start; i < populationSize - 1; i += 2) {
+			if (population[i].getFitness() > population[i + 1].getFitness()) {
+				if (population[i].getFitness() > best) {
+					best = population[i].getFitness();
+					bestMember = i;
+				}
+				if (population[i + 1].getFitness() < worst) {
+					worst = population[i + 1].getFitness();
+					worstMember = i + 1;
+				}
+			} else {
+				if (population[i].getFitness() < worst) {
+					worst = population[i].getFitness();
+					worstMember = i;
+				}
+				if (population[i + 1].getFitness() > best) {
+					best = population[i + 1].getFitness();
+					bestMember = i + 1;
+				}
+			}
+		}
+		// if best individual from the new population is better than
+		// the best individual from the previous population, then
+		// copy the best from the new population; else replace the
+		// worst individual from the current population with the
+		// best one from the previous generation
+		if (best > theBest.getFitness()) {
+			population[bestMember].copyChromosome(theBest);
+			theBestGeneration = generationNum;
+		} else {
+			theBest.copyChromosome(population[worstMember]);
+		}
+
+		if (Debug.flag) {
+			printChromosome("elitism, best (index=" + bestMember + ")", population[bestMember]);
+			printChromosome("elitism, worst (index=" + worstMember + ")", population[worstMember]);
+		}
+	}
+
+	private void justUpdateTheBest() {
+		double currentBestFitness = population[0].getFitness();
+		double next = -1;
+		int currentBest = 0; // index of the current best individual
+
+		for (int j = 1; j < populationSize; j++) {
+			if ((next = population[j].getFitness()) > currentBestFitness) {
+				currentBest = j;
+				currentBestFitness = next;
+			}
+		}
+		if (currentBestFitness > theBest.getFitness()) {
+			population[currentBest].copyChromosome(theBest);
+			theBestGeneration = generationNum;
+		}
+		if (Debug.flag) {
+			printChromosome("theBest (generation=" + theBestGeneration + ")", theBest);
+		}
+	}
 }

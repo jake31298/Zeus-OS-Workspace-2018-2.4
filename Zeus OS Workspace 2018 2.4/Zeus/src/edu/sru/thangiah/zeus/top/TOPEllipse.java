@@ -9,15 +9,12 @@ package edu.sru.thangiah.zeus.top;
  * @version 1.0
  */
 public class TOPEllipse {
-  public static final long serialVersionUID = 1;
-  private double focusAX, focusAY, focusBX, focusBY;               //Coordinates of the two foci of the ellipse
-  private double sumDistance;                                      //Sum of the distances from the two foci
-  private double centerX, centerY;                                 //Coordinates of the ellipse's center
-  private double semiMajorAxis, semiMinorAxis;                     //Half the length of the ellipse's two axes
+  private double focusAX, focusAY, focusBX, focusBY, sumDistance;
+  private double centerX, centerY, semiMajorAxis, semiMinorAxis;
 
   //Constructor
   public TOPEllipse(double ax, double ay, double bx, double by, double dist) {
-    double fociDistance;                //Distance between the ellipse's two foci
+    double fociDistance;
 
     focusAX = ax;
     focusAY = ay;
@@ -70,38 +67,6 @@ public class TOPEllipse {
    */
   public double getCenterY() {
     return centerY;
-  }
-
-  /**
-   * Returns the x-coordinate of the ellipse's first focus
-   * @return double
-   */
-  public double getFocusAX() {
-    return focusAX;
-  }
-
-  /**
-   * Returns the y-coordinate of the ellipse's first focus
-   * @return double
-   */
-  public double getFocusAY() {
-    return focusAY;
-  }
-
-  /**
-   * Returns the x-coordinate of the ellipse's second focus
-   * @return double
-   */
-  public double getFocusBX() {
-    return focusBX;
-  }
-
-  /**
-   * Returns the y-coordinate of the ellipse's second focus
-   * @return double
-   */
-  public double getFocusBY() {
-    return focusBY;
   }
 
   /**

@@ -235,7 +235,7 @@ public class TOPRouteDisplayFrame
       }
 
       root.add(dnode);
-      depot = depot.getTOPNext();
+      depot = depot.getNext();
     }
 
     return new TOPJCheckTree(root);

@@ -13,17 +13,16 @@ import edu.sru.thangiah.zeus.core.Shipment;
  * @author Sam R. Thangiah
  * @version 2.0
  */
+
 public class TOPNodes
     extends Nodes
     implements java.io.Serializable, java.lang.Cloneable {
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  public static final long serialVersionUID = 1;
-
-  public TOPNodes() {
-    super();
-    setNext(null);
-    setPrev(null);
-
+public TOPNodes() {
   }
 
   /**
@@ -31,10 +30,8 @@ public class TOPNodes
    * @param s shipment conatining this cells information
    */
   public TOPNodes(TOPShipment s) {
-    super();
-    TOPShipment theShipment = s;
-    setNext(null);
-    setPrev(null);
+    //super(s);
+    this.setShipment(s);
   }
 
   /**
@@ -44,30 +41,30 @@ public class TOPNodes
   public TOPNodes getTOPNext() {
     return (TOPNodes) getNext();
   }
-
   public TOPNodes getTOPPrev() {
-    return (TOPNodes) getPrev();
-  }
+	    return (TOPNodes) getPrev();
+	  }
 
-  public TOPShipment getTOPShipment() {
-    return (TOPShipment)getTOPShipment();
-  }
-
+	  public TOPShipment getTOPShipment() {
+	    return (TOPShipment)this.getShipment();
+	  }
   /**
    * Creates a copy of this node and returns it. It will not create the next
    * and prev links, because this would cause infinate recursion. These are
    * set in the nodes linked list clone() function.
    * @return Object node clone
    */
+  
   public Object clone() {
-    TOPNodes clonedNode = new TOPNodes();
+	    TOPNodes clonedNode = new TOPNodes();
+	    
+	    if(this.getShipment() != null) {
+	    	clonedNode.setShipment((TOPShipment)this.getTOPShipment().clone());
+	    }
+	    else
+	    	clonedNode.setShipment(new TOPShipment());
 
-    //clonedNode.theShipment = (TOPShipment)this.getTOPShipment().clone(); Original
-    clonedNode.setShipment((TOPShipment) this.getTOPShipment().clone()); //Added 30 SEP 2019
-    clonedNode.setNext(this.getTOPNext());
-    clonedNode.setPrev(this.getTOPPrev());
-
-    return clonedNode;
-  }
+	    return clonedNode;
+	  }
 
 }

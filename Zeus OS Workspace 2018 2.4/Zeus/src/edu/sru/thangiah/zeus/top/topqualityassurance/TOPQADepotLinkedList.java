@@ -22,7 +22,7 @@ public class TOPQADepotLinkedList
     boolean status = true;
     for (int i = 0; i < getDepots().size(); i++) {
       TOPQADepot depot = (TOPQADepot) getDepots().elementAt(i);
-      status = status && depot.checkDistanceConstraint();
+      status = status && depot.checkDistanceConstraint(depot);
     }
     return status;
   }

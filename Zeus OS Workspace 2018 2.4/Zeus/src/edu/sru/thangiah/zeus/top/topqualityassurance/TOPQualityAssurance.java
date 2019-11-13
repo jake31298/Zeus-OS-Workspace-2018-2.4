@@ -1,11 +1,8 @@
 package edu.sru.thangiah.zeus.top.topqualityassurance;
 
 import edu.sru.thangiah.zeus.core.*;
-import edu.sru.thangiah.zeus.top.*;
 import edu.sru.thangiah.zeus.qualityassurance.*;
-import edu.sru.thangiah.zeus.top.TOPDepotLinkedList;
-import edu.sru.thangiah.zeus.top.TOPShipmentLinkedList;
-//import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
+import edu.sru.thangiah.zeus.top.*;
 
 import java.io.*;
 import java.util.*;
@@ -24,8 +21,8 @@ public class TOPQualityAssurance
     extends QualityAssurance {
   TOPDepotLinkedList mainDepots;
   TOPShipmentLinkedList mainShipments;
-  TOPQADepotLinkedList TOPQADepots;
-  TOPQAShipmentLinkedList TOPQAShipments;
+  TOPQADepotLinkedList vrpQADepots;
+  TOPQAShipmentLinkedList vrpQAShipments;
 
   File shipFile;
   File solFile;
@@ -33,13 +30,13 @@ public class TOPQualityAssurance
   public TOPQualityAssurance() {
   }
 
-  public TOPQualityAssurance(TOPDepotLinkedList mainDepots2, TOPShipmentLinkedList mainShipments2) {
+  public TOPQualityAssurance(TOPDepotLinkedList md, TOPShipmentLinkedList ms) {
     //used for writing out the files
-    mainDepots = mainDepots2;
-    mainShipments = mainShipments2;
+    mainDepots = md;
+    mainShipments = ms;
     //used for reading in the information
-    TOPQAShipments = new TOPQAShipmentLinkedList();
-    TOPQADepots = new TOPQADepotLinkedList();
+    vrpQAShipments = new TOPQAShipmentLinkedList();
+    vrpQADepots = new TOPQADepotLinkedList();
 
     //Write out the information that is in the data structures. This does not read the original file
     //Might need another function that reads in the original files and checks if they are correct
@@ -54,7 +51,7 @@ public class TOPQualityAssurance
      * available trucks */
     //Area all the customer being serviced and are they serviced only once
     System.out.print("Check on all customers being serviced and serviced no more than once:");
-    isGood = TOPQAShipments.customerServicedOnlyOnce(TOPQADepots);
+    isGood = vrpQAShipments.customerServicedOnlyOnce(vrpQADepots);
     if (isGood) {
       System.out.println("Passed");
     }
@@ -64,7 +61,7 @@ public class TOPQualityAssurance
 
     //Check on maximum travel time of truck
     System.out.print("Check on maximum travel time of trucks:");
-    isGood = isGood && TOPQADepots.checkDistanceConstraint();
+    isGood = isGood && vrpQADepots.checkDistanceConstraint();
     /** @todo Need a check to ensure that the constraints of the routes are met - maximum distance and capacity*/
     if (isGood) {
       System.out.println("Passed");
@@ -76,7 +73,7 @@ public class TOPQualityAssurance
     //Check on maximum demand of a truck
     System.out.print("Check on maximum demand of trucks:");
 
-    isGood = isGood && TOPQADepots.checkCapacityConstraint();
+    isGood = isGood && vrpQADepots.checkCapacityConstraint();
     /** @todo Need a check to ensure that the constraints of the routes are met - maximum distance and capacity*/
     if (isGood) {
       System.out.println("Passed");
@@ -92,15 +89,14 @@ public class TOPQualityAssurance
     PrintStream out = null;
     try {
       //write the shipment information - C:/temp/ship.txt
-      //shipFile = new File(ProblemInfo.tempFileLocation + "/ship.txt"); // Original
-      shipFile = new File(ZeusProblemInfo.getTempFileLocation() + "/ship.txt");
+      shipFile = new File(ZeusProblemInfo.getTempFileLocation()+ "/ship.txt");
       out = new PrintStream(new FileOutputStream(shipFile));
       mainShipments.writeShipments(out);
 
       //write the current solution - C:/temp/sol.txt
-      //solFile = new File(ProblemInfo.tempFileLocation + "/sol.txt"); // Original
       solFile = new File(ZeusProblemInfo.getTempFileLocation() + "/sol.txt");
       out = new PrintStream(new FileOutputStream(solFile));
+      //mainDepots.expandAllRoutes(); //not needed for the TOP
       mainDepots.printDepotLinkedList(out);
     }
     catch (IOException ioe) {
@@ -134,8 +130,8 @@ public class TOPQualityAssurance
         s.setX(Float.parseFloat(st.nextToken().trim()));
         s.setY(Float.parseFloat(st.nextToken().trim()));
         //s.setPup(st.nextToken());
-        //Add to the quality assurance shipment linked list
-        TOPQAShipments.getShipments().add(s);
+        //Add to the auality assurance shipment linked list
+        vrpQAShipments.getShipments().add(s);
       }
     }
     catch (Exception e) {
@@ -153,21 +149,13 @@ public class TOPQualityAssurance
     }
   }
 
-
-  /**
-   * Modified by Pete - Caution.
-   */
   public void readSolutionFile() {
     BufferedReader br = null;
     try {
       StringTokenizer st;
       br = new BufferedReader(new FileReader(solFile));
 
-      String ssss = solFile.getName();
-      String str = br.readLine();
-
-      int depots = Integer.parseInt(str.trim());
-      depots =  1; // Set to 2 for the TOP problem.
+      int depots = Integer.parseInt(br.readLine().trim());
       for (int i = 0; i < depots; i++) {
         st = new StringTokenizer(br.readLine());
         //Add to quality assurance depot
@@ -191,21 +179,27 @@ public class TOPQualityAssurance
           t.setMaxDistance(Double.parseDouble(st.nextToken().trim()));
 
           int numNodes = Integer.parseInt(st.nextToken().trim());
-          for (int k = 0; k < numNodes; k++) {
+          //the first node is the depot node
+          TOPQANode n = new TOPQANode();
+          n.setIndex(0);
+          n.setDemand(0);
+          n.setX(d.getX());
+          n.setY(d.getY());
+          t.getNodes().add(n); //add the node
+          for (int k = 1; k < numNodes+1; k++) {
             st = new StringTokenizer(br.readLine());
             //Add to quality assurance node
-            TOPQANode n = new TOPQANode();
+            n = new TOPQANode();
             n.setIndex(Integer.parseInt(st.nextToken().trim()));
             n.setDemand(Double.parseDouble(st.nextToken().trim()));
             n.setX(Float.parseFloat(st.nextToken().trim()));
             n.setY(Float.parseFloat(st.nextToken().trim()));
             n.setType(st.nextToken().trim());
-
             t.getNodes().add(n);
           }
           d.getTrucks().add(t);
         }
-        TOPQADepots.getDepots().add(d);
+        vrpQADepots.getDepots().add(d);
       }
     }
     catch (Exception e) {

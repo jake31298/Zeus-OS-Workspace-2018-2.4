@@ -1,7 +1,5 @@
 package edu.sru.thangiah.zeus.top;
 
-import java.util.Vector;
-
 //import the parent class
 import edu.sru.thangiah.zeus.core.TruckType;
 
@@ -18,27 +16,30 @@ import edu.sru.thangiah.zeus.core.TruckType;
 public class TOPTruckType
     extends TruckType
     implements java.io.Serializable, java.lang.Cloneable {
-  public static final long serialVersionUID = 1;
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  public TOPTruckType() {
+public TOPTruckType() {
   }
 
   /**
    * Constructor
    * @param N type number
-   * @param d max duration
+   * @param D max duration
    * @param Q max capacity
    * @param s type of customers the truck can service
    */
-  public TOPTruckType(int N, double d, float Q, String s) {
+  public TOPTruckType(int N, float D, float Q, String s) {
     setTruckNo(N);
     setServiceType(s);
 
-    if (d == 0) {
+    if (D == 0) {
       setMaxDuration(Integer.MAX_VALUE);
     }
     else {
-      setMaxDuration(d);
+    	setMaxDuration(D);
     }
 
     if (Q == 0) {
@@ -50,19 +51,18 @@ public class TOPTruckType
 
     setFixedCost(getMaxCapacity());
     setVariableCost((double) getMaxCapacity() / 1000);
-    
-    //Added to instantiate vector
-	TOPProblemInfo.truckTypes = new Vector<TOPTruckType>();
-
   }
 
-  /**
-   * Returns an exact copy of the truck type object
-   * @return Object
-   */
   public Object clone() {
-    TOPTruckType clonedTruckType = new TOPTruckType(this.getTruckNo(), this.getMaxDuration(), this.getMaxCapacity(), this.getServiceType());
+	    TOPTruckType clonedTruckType = new TOPTruckType();
+	    clonedTruckType.setFixedCost(this.getFixedCost());
+	    clonedTruckType.setMaxCapacity(this.getMaxCapacity());
+	    clonedTruckType.setMaxDuration(this.getMaxDuration());
+	    clonedTruckType.setServiceType(this.getServiceType());
+	    clonedTruckType.setTruckNo(this.getTruckNo());
+	    clonedTruckType.setVariableCost(this.getVariableCost());
 
-    return clonedTruckType;
-  }
+	    return clonedTruckType;
+	  }
+  
 }

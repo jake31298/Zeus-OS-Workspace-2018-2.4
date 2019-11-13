@@ -23,6 +23,27 @@ public class TOPTruckLLCostFunctions
     return tLL.getAttributes().getTotalCost();
   }
 
+  /* public double getTotalConstraintCost(Object o) {
+     TOPTruckLinkedList tLL = (TOPTruckLinkedList) o;
+     setTotalConstraintCost(o);
+
+     return tLL.getAttributes().totalConstraintCost;
+   }*/
+
+  /*public double getTotalCrossRoadPenaltyCost(Object o) {
+    TOPTruckLinkedList tLL = (TOPTruckLinkedList) o;
+    setTotalCrossRoadPenaltyCost(o);
+
+    return tLL.getAttributes().totalCrossRoadPenaltyCost;
+     }*/
+
+  /*public double getTotalTurnAroundPenaltyCost(Object o) {
+    TOPTruckLinkedList tLL = (TOPTruckLinkedList) o;
+    setTotalTurnAroundPenaltyCost(o);
+
+    return tLL.getAttributes().totalTurnAroundPenaltyCost;
+     }*/
+
   public float getTotalDemand(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
     setTotalDemand(o);
@@ -41,9 +62,7 @@ public class TOPTruckLLCostFunctions
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
     setTotalTravelTime(o);
 
-    //return truckLL.attributes.totalTravelTime;
     return truckLL.getAttributes().getTotalTravelTime();
-
   }
 
   public double getMaxTravelTime(Object o) {
@@ -62,163 +81,172 @@ public class TOPTruckLLCostFunctions
 
   public void setTotalCost(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    //truckLL.getAttributes().totalCost = 0;
     truckLL.getAttributes().setTotalCost(0);
-
 
     Truck t = truckLL.getHead();
 
-    while (t != null) {
-      //if (!t.isEmpty()) { // Original
-      if (!((TOPTruck) t).isEmpty()) {
-  
-        //truckLL.getAttributes().totalCost += ProblemInfo.truckLevelCostF.
-        truckLL.getAttributes().setTotalCost((ZeusProblemInfo.getTruckLevelCostF().getTotalCost(t)) 
-        		+ truckLL.getAttributes().getTotalCost());
+    while (t != truckLL.getTail()) {
+      if (!t.isEmptyMainNodes()) {
+        truckLL.getAttributes().setTotalCost(truckLL.getAttributes().getTotalCost() + ZeusProblemInfo.getTruckLevelCostF().
+            getTotalCost(t));
       }
 
       t = t.getNext();
     }
   }
 
+  /*public void setTotalConstraintCost(Object o) {
+    TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
+    truckLL.getAttributes().totalConstraintCost = 0;
+
+    Truck t = truckLL.getHead();
+
+    while (t != getTail()) {
+      if (!t.isEmpty()) {
+        truckLL.getAttributes().totalConstraintCost += ZeusProblemInfo.truckLevelCostF.
+            getTotalConstraintCost(t);
+      }
+
+      t = t.getNext();
+    }
+     }*/
+
+  /*public void setTotalCrossRoadPenaltyCost(Object o) {
+    TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
+    truckLL.getAttributes().totalCrossRoadPenaltyCost = 0;
+
+    Truck t = truckLL.getHead();
+
+    while (t != getTail()) {
+      if (!t.isEmpty()) {
+        truckLL.getAttributes().totalCrossRoadPenaltyCost += ZeusProblemInfo.
+            truckLevelCostF.getTotalCrossRoadPenaltyCost(t);
+      }
+
+      t = t.getNext();
+    }
+     }*/
+
+  /* public void setTotalTurnAroundPenaltyCost(Object o) {
+     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
+     truckLL.getAttributes().totalTurnAroundPenaltyCost = 0;
+
+     Truck t = truckLL.getHead();
+
+     while (t != getTail()) {
+       if (!t.isEmpty()) {
+         truckLL.getAttributes().totalTurnAroundPenaltyCost += ZeusProblemInfo.
+             truckLevelCostF.getTotalTurnAroundPenaltyCost(t);
+       }
+
+       t = t.getNext();
+     }
+   }*/
+
   public void setTotalDemand(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    //truckLL.getAttributes().totalDemand = 0;
     truckLL.getAttributes().setTotalDemand(0);
 
-    TOPTruck t = (TOPTruck) truckLL.getHead();
-    TOPTruck temp = t;
+    TOPTruck t = truckLL.getHead();
 
-    while (t != null) {
-      if (!t.isEmpty())
-      {
-        //truckLL.getAttributes().totalDemand += ProblemInfo.truckLevelCostF.getTotalDemand(t);
-        truckLL.getAttributes().setTotalDemand((ZeusProblemInfo.getTruckLevelCostF().getTotalDemand(t)) 
-        		+ truckLL.getAttributes().getTotalDemand());
-
+    while (t != truckLL.getTail()) {
+      if (!t.isEmptyMainNodes()) {
+        truckLL.getAttributes().setTotalDemand(truckLL.getAttributes().getTotalDemand() + ZeusProblemInfo.getTruckLevelCostF().
+            getTotalDemand(t));
       }
 
-      t = (TOPTruck) t.getNext();
-      if(t == temp){
-        break;  // Break if the list loops back on itself instead of ending in a null.
-      }
+      t = t.getTOPNext();
     }
   }
 
   public void setTotalDistance(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    //truckLL.getAttributes().totalDistance = 0;
-    truckLL.getAttributes().setTotalDistance(0);
+    truckLL.getAttributes().getTotalDistance();
 
+    TOPTruck t = truckLL.getHead();
 
-    Truck t = truckLL.getHead();
-
-    while (t != null) {
-      //if (!t.isEmpty()) {
-      if (!((TOPTruck) t).isEmpty()) {
-
-        //truckLL.getAttributes().totalDistance += ProblemInfo.truckLevelCostF.getTotalDistance(t);
-        truckLL.getAttributes().setTotalDistance((ZeusProblemInfo.getTruckLevelCostF().getTotalDistance(t)) 
-        		+ truckLL.getAttributes().getTotalDistance());
-
+    while (t != truckLL.getTail()) {
+      if (!t.isEmptyMainNodes()) {
+        truckLL.getAttributes().setTotalDistance(truckLL.getAttributes().getTotalDistance() + ZeusProblemInfo.getTruckLevelCostF().
+            getTotalDistance(t));
       }
 
-      t = t.getNext();
+      t = t.getTOPNext();
     }
   }
 
   public void setTotalTravelTime(Object o) {
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    //truckLL.getAttributes().totalTravelTime = 0;
     truckLL.getAttributes().setTotalTravelTime(0);
 
+    TOPTruck t = truckLL.getHead();
 
-    Truck t = truckLL.getHead();
-
-    while (t != null) {
-      //if (!t.isEmpty()) {
-      if (!((TOPTruck) t).isEmpty()) {
-
-        //truckLL.getAttributes().totalTravelTime += ProblemInfo.truckLevelCostF.getTotalTravelTime(t);
-        truckLL.getAttributes().setTotalTravelTime((ZeusProblemInfo.getTruckLevelCostF().getTotalTravelTime(t)) 
-        		+ truckLL.getAttributes().getTotalTravelTime());
-
+    while (t != truckLL.getTail()) {
+      if (!t.isEmptyMainNodes()) {
+        truckLL.getAttributes().setTotalTravelTime(truckLL.getAttributes().getTotalTravelTime() + ZeusProblemInfo.getTruckLevelCostF().
+            getTotalTravelTime(t));
       }
 
-      t = t.getNext();
+      t = t.getTOPNext();
     }
   }
 
   public void setMaxTravelTime(Object o) {
     double max = 0;
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    Truck t = truckLL.getHead();
+    TOPTruck t = truckLL.getHead();
 
-    while (t != null) {
-      //if (!t.isEmpty()) {
-      if (!((TOPTruck) t).isEmpty()) {
-
-        //if (ProblemInfo.truckLevelCostF.getMaxTravelTime(t) > max) {
+    while (t != truckLL.getTail()) {
+      if (!t.isEmptyMainNodes()) {
         if (ZeusProblemInfo.getTruckLevelCostF().getMaxTravelTime(t) > max) {
-
-          //max = ProblemInfo.truckLevelCostF.getMaxTravelTime(t);
           max = ZeusProblemInfo.getTruckLevelCostF().getMaxTravelTime(t);
-
         }
       }
 
-      t = t.getNext();
+      t = t.getTOPNext();
     }
 
-    //truckLL.getAttributes().maxTravelTime = max;
     truckLL.getAttributes().setMaxTravelTime(max);
-
   }
 
   public void setAvgTravelTime(Object o) {
     double avg = 0;
     TOPTruckLinkedList truckLL = (TOPTruckLinkedList) o;
-    Truck t = truckLL.getHead();
+    TOPTruck t = truckLL.getHead();
 
     if ( (truckLL.getSize() != 0) &&
-        //(ProblemInfo.truckLLLevelCostF.getTotalDemand(truckLL) != 0)) {
         (ZeusProblemInfo.getTruckLLLevelCostF().getTotalDemand(truckLL) != 0)) {
-
-      while (t != null) {
-        //if (!t.isEmpty()) {
-        if (!((TOPTruck) t).isEmpty()) {
-
+      while (t != truckLL.getTail()) {
+        if (!t.isEmptyMainNodes()) {
           avg +=
-              //(ProblemInfo.truckLevelCostF.getAvgTravelTime(t) * ProblemInfo.truckLevelCostF.getTotalDemand(t));
-              (ZeusProblemInfo.getTruckLevelCostF().getAvgTravelTime(t) 
-            		  * ZeusProblemInfo.getTruckLevelCostF().getTotalDemand(t));
-
+              (ZeusProblemInfo.getTruckLevelCostF().getAvgTravelTime(t) *
+               ZeusProblemInfo.getTruckLevelCostF().getTotalDemand(t));
         }
 
-        t = t.getNext();
+        t = t.getTOPNext();
       }
 
-      //truckLL.getAttributes().avgTravelTime = avg / ProblemInfo.truckLLLevelCostF.getTotalDemand(truckLL);
-      truckLL.getAttributes().setAvgTravelTime(avg / (ZeusProblemInfo.getTruckLLLevelCostF().getTotalDemand(truckLL)));
-
+      truckLL.getAttributes().setAvgTravelTime(avg /
+          ZeusProblemInfo.getTruckLLLevelCostF().getTotalDemand(truckLL));
     }
     else {
-      //truckLL.getAttributes().avgTravelTime = 0;
       truckLL.getAttributes().setAvgTravelTime(0);
-
     }
   }
 
+  /** @todo Might not need CrossRoadPenaltyCost and TurnAroundPenaltyCost */
   public void calculateTotalsStats(Object o) {
     setTotalDemand(o);
     setTotalDistance(o);
     setTotalTravelTime(o);
     setMaxTravelTime(o);
     setAvgTravelTime(o);
+    //setTotalCrossRoadPenaltyCost(o);
+    //setTotalTurnAroundPenaltyCost(o);
     setTotalCost(o);
+    //setTotalConstraintCost(o);
   }
 
-// Added 1 OCT 2019
 @Override
 public int getTotalDays(Object arg0) {
 	// TODO Auto-generated method stub

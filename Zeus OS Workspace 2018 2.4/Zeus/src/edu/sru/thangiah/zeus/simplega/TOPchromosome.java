@@ -55,16 +55,16 @@ public class TOPchromosome extends  edu.sru.thangiah.zeus.simplega.DoubleChromos
    }
 
    protected double evalChromosome() {
-     TOPProblemInfo.numTargetAreas             = (int)Math.ceil(gene[0]);
-     TOPProblemInfo.overMaxDistanceCostPenalty = gene[1];
-     TOPProblemInfo.targetPointDistanceFactor  = gene[2];
-     TOPProblemInfo.maxDistanceBuffer          = gene[3];
-     TOPProblemInfo.targetEllipseSizeFactor    = gene[4];
-     TOPProblemInfo.initialAngle               = gene[5];
+     TOPProblemInfo.setNumTargetAreas((int)Math.ceil(gene[0]));
+     TOPProblemInfo.setOverMaxDistanceCostPenalty(gene[1]);
+     TOPProblemInfo.setTargetPointDistanceFactor(gene[2]);
+     TOPProblemInfo.setMaxDistanceBuffer(gene[3]);
+     TOPProblemInfo.setTargetEllipseSizeFactor(gene[4]);
+     TOPProblemInfo.setInitialAngle(gene[5]);
 
-     System.out.println(":::: numTargetAreas(" + TOPProblemInfo.numTargetAreas + ") at overMaxDistanceCostPenalty "
-                        + TOPProblemInfo.overMaxDistanceCostPenalty + "\n" + "\ntargetPointDistanceFactor=" + TOPProblemInfo.targetPointDistanceFactor
-                        + ", maxDistanceBuffer=" + TOPProblemInfo.maxDistanceBuffer + ", TargetEllipseSizeFactor=" + TOPProblemInfo.targetEllipseSizeFactor + "." );
+     System.out.println(":::: numTargetAreas(" + TOPProblemInfo.getNumTargetAreas() + ") at overMaxDistanceCostPenalty "
+                        + TOPProblemInfo.getOverMaxDistanceCostPenalty() + "\n" + "\ntargetPointDistanceFactor=" + TOPProblemInfo.getTargetPointDistanceFactor()
+                        + ", maxDistanceBuffer=" + TOPProblemInfo.getMaxDistanceBuffer() + ", TargetEllipseSizeFactor=" + TOPProblemInfo.getTargetEllipseSizeFactor() + "." );
 
      theTOP = new TOP(file);
 
@@ -72,15 +72,15 @@ public class TOPchromosome extends  edu.sru.thangiah.zeus.simplega.DoubleChromos
      if(thefitness > bestAnswer){
        bestAnswer = thefitness;
 
-       bestNumTargetAreas = TOPProblemInfo.numTargetAreas;
-       bestOverMaxDistanceCostPenalty = TOPProblemInfo.overMaxDistanceCostPenalty;
-       bestTargetPointDistance = TOPProblemInfo.targetPointDistanceFactor;
-       bestMaxDistanceBuffer = TOPProblemInfo.maxDistanceBuffer;
-       bestTargetEllipseSizeFactor = TOPProblemInfo.targetEllipseSizeFactor;
+       bestNumTargetAreas = TOPProblemInfo.getNumTargetAreas();
+       bestOverMaxDistanceCostPenalty = TOPProblemInfo.getOverMaxDistanceCostPenalty();
+       bestTargetPointDistance = TOPProblemInfo.getTargetPointDistanceFactor();
+       bestMaxDistanceBuffer = TOPProblemInfo.getMaxDistanceBuffer();
+       bestTargetEllipseSizeFactor = TOPProblemInfo.getTargetEllipseSizeFactor();
      }
      System.out.println( bestAnswer + " = BEST ANSWER SO FAR. (Problem " + this.file + ")" );
 
-     parent.compareToBest(theTOP); // Record this result, if it is better than the previous ones.
+    // parent.compareToBest(theTOP); // Record this result, if it is better than the previous ones.
      return thefitness;
    }
 
@@ -94,17 +94,17 @@ public class TOPchromosome extends  edu.sru.thangiah.zeus.simplega.DoubleChromos
     * @return String
     */
    public String parametersToString(){
-     TOPProblemInfo.numTargetAreas             = (int)Math.ceil(gene[0]);
-     TOPProblemInfo.overMaxDistanceCostPenalty = gene[1];
-     TOPProblemInfo.targetPointDistanceFactor  = gene[2];
-     TOPProblemInfo.maxDistanceBuffer          = gene[3];
-     TOPProblemInfo.targetEllipseSizeFactor    = gene[4];
-     TOPProblemInfo.initialAngle               = gene[5];
+     TOPProblemInfo.setNumTargetAreas((int)Math.ceil(gene[0]));
+     TOPProblemInfo.setOverMaxDistanceCostPenalty(gene[1]);
+     TOPProblemInfo.setTargetPointDistanceFactor(gene[2]);
+     TOPProblemInfo.setMaxDistanceBuffer(gene[3]);
+     TOPProblemInfo.setTargetEllipseSizeFactor(gene[4]);
+     TOPProblemInfo.setInitialAngle(gene[5]);
 
-     String temp = "|File=" + file + "|numTargetAreas=" + TOPProblemInfo.numTargetAreas + "|overMaxDistanceCostPenalty="
-         + TOPProblemInfo.overMaxDistanceCostPenalty + "|targetPointDistanceFactor=" + TOPProblemInfo.targetPointDistanceFactor
-         + "|maxDistanceBuffer=" + TOPProblemInfo.maxDistanceBuffer + "|targetEllipseSizeFactor=" + TOPProblemInfo.targetEllipseSizeFactor
-         + "|initialAngle=" + TOPProblemInfo.initialAngle +"\n" ;
+     String temp = "|File=" + file + "|numTargetAreas=" + TOPProblemInfo.getNumTargetAreas() + "|overMaxDistanceCostPenalty="
+         + TOPProblemInfo.getOverMaxDistanceCostPenalty() + "|targetPointDistanceFactor=" + TOPProblemInfo.getTargetPointDistanceFactor()
+         + "|maxDistanceBuffer=" + TOPProblemInfo.getMaxDistanceBuffer() + "|targetEllipseSizeFactor=" + TOPProblemInfo.getTargetEllipseSizeFactor()
+         + "|initialAngle=" + TOPProblemInfo.getInitialAngle() +"\n" ;
      return temp;
    }
 

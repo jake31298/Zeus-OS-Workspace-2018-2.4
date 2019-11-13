@@ -1,0 +1,111 @@
+package edu.sru.thangiah.zeus.simplega;
+import edu.sru.thangiah.zeus.top.TOP;
+import edu.sru.thangiah.zeus.top.TOPProblemInfo;
+
+
+public class TOPchromosome extends  edu.sru.thangiah.zeus.simplega.DoubleChromosome {// this user-defined class
+                                   // implements evalChromosome,
+
+  static double maxRecur;
+  static double bestAnswer = 0.0;
+
+  static double bestNumTargetAreas;
+  static double bestOverMaxDistanceCostPenalty;
+  static double bestTargetPointDistance;
+  static double bestMaxDistanceBuffer;
+  static double bestTargetEllipseSizeFactor;
+  private TOP theTOP;
+
+   protected TOPchromosome(String file, sGA parent) {              // toPhenotype;
+      super(file,parent);                              // defines chromosomeLength,
+      this.file = file;
+      theTOP = null;
+      this.parent = parent;
+   }
+
+   static {
+      chromosomeLength = 6;
+      Globals.stdout.println("TOPchromosome: chromosome length is "
+         + chromosomeLength + ": Filename is " + file);
+      knownSolutionFitness = false;
+      solutionFitness = -1;
+
+      double minTargetAreas = 0.0;
+      double maxTargetAreas = 25.0;
+
+      double minOverDistancePenalty = 1.0; // Seems to work better when set closer to 1
+      double maxOverDistancePenalty = 2.0;
+
+      double minTargetPointDistance = 0.0;
+      double maxTargetPointDistance = 1.1;  // Has quite an effect on the solution.  Should probably tone down the range.
+
+      double minDistanceBuff = 1.0;  // WARNING: Values less than 1 can cause routing to freeze
+      double maxDistanceBuff = 1.3;  // Want to keep this small
+
+      double minTargetEllipseFactor = 0.1;
+      double maxTargetEllipseFactor = 0.95;
+
+      double minInitialAngle = 0.0;
+      double maxInitialAngle = 2*Math.PI;
+
+      double[] lower = {minTargetAreas, minOverDistancePenalty, minTargetPointDistance, minDistanceBuff, minTargetEllipseFactor, minInitialAngle};
+        geneLowerBound = lower;
+      double[] upper = {maxTargetAreas, maxOverDistancePenalty, maxTargetPointDistance, maxDistanceBuff, maxTargetEllipseFactor, maxInitialAngle};
+        geneUpperBound = upper;
+   }
+
+   protected double evalChromosome() {
+     TOPProblemInfo.setNumTargetAreas((int)Math.ceil(gene[0]));
+     TOPProblemInfo.setOverMaxDistanceCostPenalty(gene[1]);
+     TOPProblemInfo.setTargetPointDistanceFactor(gene[2]);
+     TOPProblemInfo.setMaxDistanceBuffer(gene[3]);
+     TOPProblemInfo.setTargetEllipseSizeFactor(gene[4]);
+     TOPProblemInfo.setInitialAngle(gene[5]);
+
+     System.out.println(":::: numTargetAreas(" + TOPProblemInfo.getNumTargetAreas() + ") at overMaxDistanceCostPenalty "
+                        + TOPProblemInfo.getOverMaxDistanceCostPenalty() + "\n" + "\ntargetPointDistanceFactor=" + TOPProblemInfo.getTargetPointDistanceFactor()
+                        + ", maxDistanceBuffer=" + TOPProblemInfo.getMaxDistanceBuffer() + ", TargetEllipseSizeFactor=" + TOPProblemInfo.getTargetEllipseSizeFactor() + "." );
+
+     theTOP = new TOP(file, 0);
+
+     double thefitness  = theTOP.getTotalFitness();
+     if(thefitness > bestAnswer){
+       bestAnswer = thefitness;
+
+       bestNumTargetAreas = TOPProblemInfo.numTargetAreas;
+       bestOverMaxDistanceCostPenalty = TOPProblemInfo.overMaxDistanceCostPenalty;
+       bestTargetPointDistance = TOPProblemInfo.targetPointDistanceFactor;
+       bestMaxDistanceBuffer = TOPProblemInfo.maxDistanceBuffer;
+       bestTargetEllipseSizeFactor = TOPProblemInfo.targetEllipseSizeFactor;
+     }
+     System.out.println( bestAnswer + " = BEST ANSWER SO FAR. (Problem " + this.file + ")" );
+
+     parent.compareToBest(theTOP); // Record this result, if it is better than the previous ones.
+     return thefitness;
+   }
+
+   public String toPhenotype() {
+      String phenotype = "Method " + Math.round(gene[0]) + ", Recursion " + Math.round(gene[1]) + "." ;
+      return phenotype;
+   }
+
+   /**
+    * Return string for output to logfile
+    * @return String
+    */
+   public String parametersToString(){
+     TOPProblemInfo.numTargetAreas             = (int)Math.ceil(gene[0]);
+     TOPProblemInfo.overMaxDistanceCostPenalty = gene[1];
+     TOPProblemInfo.targetPointDistanceFactor  = gene[2];
+     TOPProblemInfo.maxDistanceBuffer          = gene[3];
+     TOPProblemInfo.targetEllipseSizeFactor    = gene[4];
+     TOPProblemInfo.initialAngle               = gene[5];
+
+     String temp = "|File=" + file + "|numTargetAreas=" + TOPProblemInfo.numTargetAreas + "|overMaxDistanceCostPenalty="
+         + TOPProblemInfo.overMaxDistanceCostPenalty + "|targetPointDistanceFactor=" + TOPProblemInfo.targetPointDistanceFactor
+         + "|maxDistanceBuffer=" + TOPProblemInfo.maxDistanceBuffer + "|targetEllipseSizeFactor=" + TOPProblemInfo.targetEllipseSizeFactor
+         + "|initialAngle=" + TOPProblemInfo.initialAngle +"\n" ;
+     return temp;
+   }
+
+}

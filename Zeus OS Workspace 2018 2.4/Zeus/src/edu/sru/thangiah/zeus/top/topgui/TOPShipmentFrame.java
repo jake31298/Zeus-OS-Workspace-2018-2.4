@@ -64,13 +64,13 @@ public class TOPShipmentFrame
     int nextIndex = 0, prevIndex = 0;
 
     while (shipment != null) {
-      if(shipment.getTOPPrev() == null)
+      if(shipment.getPrev() == null)
         prevIndex = -1;
       else if(shipment.getTOPNext() == null)
         nextIndex = -1;
       else {
         nextIndex = shipment.getTOPNext().getIndex();
-        prevIndex = shipment.getTOPPrev().getIndex();
+        prevIndex = shipment.getPrev().getIndex();
       }
 
       shipInfo = "#" + shipment.getIndex() + "(" + shipment.getXCoord() + "," +

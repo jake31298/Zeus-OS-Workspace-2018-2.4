@@ -2,6 +2,7 @@ package edu.sru.thangiah.zeus.top;
 
 //import the parent class
 import edu.sru.thangiah.zeus.core.Feasibility;
+import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
 
 /**
  *
@@ -16,23 +17,25 @@ import edu.sru.thangiah.zeus.core.Feasibility;
 public class TOPFeasibility
     extends Feasibility
     implements java.io.Serializable, java.lang.Cloneable {
-  public static final long serialVersionUID = 1;
-private TOPNodesLinkedList thisRoute;
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  public TOPFeasibility() {
+public TOPFeasibility() {
   }
 
   /**
    * Constructor for the feasibilty, will send the constants as well as a
    * pointer to the route that will be checked
-   * @param d max duration
-   * @param e max capacity
+   * @param maxd max duration
+   * @param maxq max capacity
    * @param thisR the route
    */
-  TOPFeasibility(double d, double e, TOPNodesLinkedList thisR) {
+  public TOPFeasibility(double maxd, float maxq, TOPNodesLinkedList thisR) {
     super(thisR);
-    setMaxDuration(d);
-    setMaxCapacity(e);
+    setMaxDuration(maxd);
+    setMaxCapacity(maxq);
     //thisRoute = thisR;
   }
 
@@ -43,24 +46,14 @@ private TOPNodesLinkedList thisRoute;
   public boolean isFeasible() {
     double currentDistance;
     double currentDemand;
-
-    currentDistance = TOPProblemInfo.nodesLLLevelCostF.getTotalDistance(getRoute());
-    currentDemand = TOPProblemInfo.nodesLLLevelCostF.getTotalDemand(getRoute());
-
-    if ( (currentDistance <= (getMaxDuration() * TOPProblemInfo.maxDistanceBuffer)) && (currentDemand <= getMaxCapacity())) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  public boolean isPostOptFeasible() {
-    double currentDistance;
-    double currentDemand;
-
-    currentDistance = TOPProblemInfo.nodesLLLevelCostF.getTotalDistance(getRoute());
-    currentDemand = TOPProblemInfo.nodesLLLevelCostF.getTotalDemand(getRoute());
+ 
+    currentDistance = ZeusProblemInfo.getNodesLLLevelCostF().getTotalDistance(getRoute());
+    currentDemand = ZeusProblemInfo.getNodesLLLevelCostF().getTotalDemand(getRoute());
+    
+    System.out.println("Current Distance ="+ currentDistance);
+    System.out.println("Current max distance ="+ getMaxDuration());
+    //System.out.println("Current Demand ="+ currentDemand);
+    
 
     if ( (currentDistance <= getMaxDuration()) && (currentDemand <= getMaxCapacity())) {
       return true;
@@ -69,10 +62,27 @@ private TOPNodesLinkedList thisRoute;
       return false;
     }
   }
+  public boolean isPostOptFeasible() {
+	    double currentDistance;
+	    double currentDemand;
 
+	    currentDistance = TOPProblemInfo.getNodesLLLevelCostF().getTotalDistance(getRoute());
+	    currentDemand = TOPProblemInfo.getNodesLLLevelCostF().getTotalDemand(getRoute());
+
+	    if ( (currentDistance <= getMaxDuration()) && (currentDemand <= getMaxCapacity())) {
+	      return true;
+	    }
+	    else {
+	      return false;
+	    }
+	  }
+  
   public Object clone() {
-    TOPFeasibility clonedFeasibility = new TOPFeasibility(this.getMaxCapacity(), this.getMaxDuration(), (TOPNodesLinkedList)this.thisRoute);
+		TOPFeasibility clonedFeasibility = new TOPFeasibility();
 
-    return clonedFeasibility;
-  }
+		clonedFeasibility.setMaxCapacity(this.getMaxCapacity());
+		clonedFeasibility.setMaxDuration(this.getMaxDuration());
+
+		return clonedFeasibility;
+	}
 }

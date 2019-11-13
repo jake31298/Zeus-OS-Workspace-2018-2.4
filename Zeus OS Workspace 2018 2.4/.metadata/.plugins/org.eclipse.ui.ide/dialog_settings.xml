@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="CleanDialogSettings">
-		<item value="500" key="DIALOG_WIDTH"/>
-		<item value="false" key="TOGGLE_SELECTED"/>
-		<item value="402" key="DIALOG_HEIGHT"/>
-		<item value="683" key="DIALOG_X_ORIGIN"/>
-		<item value="227" key="DIALOG_Y_ORIGIN"/>
+		<item key="DIALOG_WIDTH" value="500"/>
+		<item key="TOGGLE_SELECTED" value="false"/>
+		<item key="DIALOG_HEIGHT" value="402"/>
+		<item key="DIALOG_X_ORIGIN" value="683"/>
+		<item key="DIALOG_Y_ORIGIN" value="227"/>
 	</section>
 	<section name="ExternalProjectImportWizard">
-		<item value="false" key="WizardProjectsImportPage.STORE_NESTED_PROJECTS"/>
-		<item value="true" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
-		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
+		<item key="WizardProjectsImportPage.STORE_NESTED_PROJECTS" value="false"/>
+		<item key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID" value="true"/>
+		<item key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED" value="false"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
 			<item value="H:\Zeus OS Workspace"/>
 		</list>
@@ -23,7 +23,13 @@
 		</list>
 	</section>
 	<section name="ChooseWorkspaceDialogSettings">
-		<item value="340" key="DIALOG_X_ORIGIN"/>
-		<item value="192" key="DIALOG_Y_ORIGIN"/>
+		<item key="DIALOG_X_ORIGIN" value="340"/>
+		<item key="DIALOG_Y_ORIGIN" value="192"/>
+	</section>
+	<section name="SmartImportWizard">
+		<item key="SmartImportRootWizardPage.STORE_HIDE_ALREADY_OPEN" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_CLOSE_IMPORTED" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
+		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 	</section>
 </section>

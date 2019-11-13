@@ -1,36 +1,35 @@
 package edu.sru.thangiah.zeus.top;
 
+import edu.sru.thangiah.zeus.core.Nodes;
+import edu.sru.thangiah.zeus.core.NodesLinkedList;
+import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
+import edu.sru.thangiah.zeus.core.Attributes;
 //import the parent class
 import edu.sru.thangiah.zeus.core.Truck;
+import edu.sru.thangiah.zeus.core.TruckType;
 
-/**
- *
- * <p>Title: </p> TOPTruck
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: Slippery Rock University</p>
- *
- * @author Sam R. Thangiah
- * @version 1.0
- */
 public class TOPTruck
-    extends Truck
-    implements java.io.Serializable, java.lang.Cloneable {
-
-  public static final long serialVersionUID = 1;
-  private float endDepotX;      //X-coordinate of the depot where the truck will end its route
-  private float endDepotY;      //Y-coordinate of the depot where the truck will end its route
-  private boolean isTeamMember; //True if the truck is ultimately considered a member of the team.
-
-  /**
-   * Constructor
-   * Modified by Pete Schallot
-   */
-  public TOPTruck() {
+    extends Truck implements java.io.Serializable, java.lang.Cloneable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private boolean routeToOriginal;
+	private double secondDepotX;
+	private double secondDepotY;
+	private int secondDepotID;
+	private boolean isUsed;
+	private boolean isTeamMember;
+	private Object endDepotX;
+	private Object endDepotY;
+	
+	public TOPTruck() {
+	
+	  //Assign the nodes linkes list
+	 setMainNodes(new TOPNodesLinkedList());
+	  
     //Assign the attributes
-    setMainNodes(new TOPNodesLinkedList());
     setAttributes(new TOPAttributes());
-    isTeamMember = false;
   }
 
   /**
@@ -38,65 +37,63 @@ public class TOPTruck
    * @param tt truck type
    * @param depotX depot's x coordinate
    * @param depotY depot's y coordinate
-   * Modified by Pete Schallot
    */
-  public TOPTruck(TOPTruckType tt, float depX, float depY) {
+  public TOPTruck(TOPTruckType tt, double depX, double depY) {
+    //super(tt, depX, depY);
     setAttributes(new TOPAttributes());
     setDepotX(depX);
     setDepotY(depY);
-    endDepotX = depX;
-    endDepotY = depY;
-    setTruckNum(TOPProblemInfo.numTrucks++);
+    setTruckNum(ZeusProblemInfo.getNumTrucks() + 1);
     setTruckType(tt);
-    isTeamMember = false;
+    setRouteToOriginal(true);
+	setIsUsed(true);
+    
+    setMainNodes(new TOPNodesLinkedList(tt, depX, depY, getTruckNum()));
 
-    setMainNodes(new TOPNodesLinkedList(tt, depX, depY, depX, depY, getTruckNum()));
   }
-
+  
   /**
-   * Constructor
-   * @param tt TOPTruckType
-   * @param startDepX float
-   * @param startDepY float
-   * @param endDepX float
-   * @param endDepY float
-   * Added by Pete Schallot
+   * New constructor
+   * @param tt
+   * @param xCoord
+   * @param yCoord
+   * @param xCoord2ID
+   * @param xCoord2
+   * @param yCoord2
    */
+  public TOPTruck(TOPTruckType tt, double xCoord, double yCoord, int xCoord2ID,
+			double xCoord2, double yCoord2) {
+		    setAttributes(new TOPAttributes());
+		    setDepotX(xCoord);
+		    setDepotY(yCoord);
+		    setTruckNum(ZeusProblemInfo.getNumTrucks());
+		    setTruckType(tt);
+		    setRouteToOriginal(false);
+			setSecondDepotX(xCoord2);
+			setSecondDepotY(yCoord2);
+			setIsUsed(true);
+			
+		    setMainNodes(new TOPNodesLinkedList(tt, xCoord, yCoord, xCoord2ID, xCoord2, yCoord2, getTruckNum()));
+	}
+
   public TOPTruck(TOPTruckType tt, float startDepX, float startDepY, float endDepX, float endDepY) {
-    setAttributes(new TOPAttributes());
-    setDepotX(startDepX);
-    setDepotY(startDepY);
-    endDepotX = endDepX;
-    endDepotY = endDepY;
-    setTruckNum(TOPProblemInfo.numTrucks++);
-    setTruckType(tt);
-    isTeamMember = false;
+	    setAttributes(new TOPAttributes());
+	    setDepotX(startDepX);
+	    setDepotY(startDepY);
+	    endDepotX = endDepX;
+	    endDepotY = endDepY;
+	    setTruckNum(TOPProblemInfo.getNumTrucks() + 1);
+	    setTruckType(tt);
+	    isTeamMember = false;
 
-    setMainNodes(new TOPNodesLinkedList(tt, startDepX, startDepY, endDepX, endDepY, getTruckNum()));
-  }
-
-  public TOPTruck(TOPTruckType ttype, double xCoord, double yCoord) {
-	// TODO Auto-generated constructor stub
-}
-
-public TOPTruck(TOPTruckType ttype, double xCoord, double yCoord, int depotNum, double xCoord2, double yCoord2) {
-	// TODO Auto-generated constructor stub
-}
-
+	    setMainNodes(new TOPNodesLinkedList(tt, startDepX, startDepY, endDepX, endDepY, getTruckNum()));
+	  }
 /**
    * Returns the visit nodes linked list (route)
    * @return route
    */
   public TOPNodesLinkedList getTOPMainNodes() {
-    return (TOPNodesLinkedList)getMainNodes();
-  }
-
-  /**
-   * Returns the previous truck in the linked list
-   * @return next depot
-   */
-  public TOPTruck getTOPPrev() {
-    return (TOPTruck)getPrev();
+    return (TOPNodesLinkedList) getMainNodes();
   }
 
   /**
@@ -104,40 +101,80 @@ public TOPTruck(TOPTruckType ttype, double xCoord, double yCoord, int depotNum, 
    * @return next depot
    */
   public TOPTruck getTOPNext() {
-    return (TOPTruck)getNext();
+    return (TOPTruck) getNext();
   }
+  
   /**
-   * Returns the attributes of the truck
-   * @return TOPAttributes
+   * Returns truck demand 
+   * Used in TOP for total scores for teams
+   * @param currTruck
+   * @return
    */
-  public TOPAttributes getTOPAttributes() {
-    return (TOPAttributes)getAttributes();
+  public int getTruckDemand(Truck currTruck)
+  {
+	  int truckDemand = 0;
+	  Nodes currNode = currTruck.getMainNodes().getHead().getNext();
+	  
+	  while(currNode != currTruck.getMainNodes().getTail())
+	  {
+		  truckDemand += currNode.getDemand();
+		  currNode = currNode.getNext();		  
+	  }
+	  
+	  return(truckDemand);
   }
-
-  /**
-   * Returns the truck's type
-   * @return TOPTruckType
-   */
-  public TOPTruckType getTOPTruckType() {
-    return (TOPTruckType)getTruckType();
-  }
-
-  /**
-   * Specify whether or not this truck will be used as a member of the final team
-   * @param b boolean
-   */
+  
   public void setIsTeamMember(boolean b) {
-    this.isTeamMember = b;
+	  this.isTeamMember = b;
   }
-
-  /**
-   * Returns whether or not this truck is a member of the final team
-   * @return boolean
-   */
+  
   public boolean getIsTeamMember() {
-    return this.isTeamMember;
+	  return this.isTeamMember;
   }
-
+  
+  public double getSecondDepotX()
+  {
+	  return secondDepotX;
+  }
+  
+  public void setSecondDepotX(double xLoc)
+  {
+	  secondDepotX = xLoc;
+  }
+  
+  
+  public boolean getIsUsed()
+  {
+	  return isUsed;
+  }
+  
+  public void setIsUsed(boolean flag)
+  {
+	  isUsed = flag;
+  }
+  
+  
+  public double getSecondDepotY()
+  {
+	  return secondDepotY;
+  }
+  
+  public void setSecondDepotY(double yLoc)
+  {
+	  secondDepotY = yLoc;
+  }
+  
+  public boolean getRouteToOriginal()
+  {
+	  return routeToOriginal;
+  }
+  
+  public void setRouteToOriginal(boolean route)
+  {
+	  routeToOriginal = route;
+  }
+  
+  
 
   /**
    * Creates a clone of the current trucks. Does not create the next and prev
@@ -145,43 +182,27 @@ public TOPTruck(TOPTruckType ttype, double xCoord, double yCoord, int depotNum, 
    * @return Object truck clone
    */
   public Object clone() {
-    TOPTruck clonedTruck = new TOPTruck();
+	    TOPTruck clonedTruck = new TOPTruck();
 
-    clonedTruck.setAttributes((TOPAttributes)this.getTOPAttributes().clone());
-    clonedTruck.setDepotX(this.getDepotX());
-    clonedTruck.setDepotY(this.getDepotY());
-    clonedTruck.endDepotX = this.endDepotX;
-    clonedTruck.endDepotY = this.endDepotY;
-    clonedTruck.setMainNodes((TOPNodesLinkedList)this.getTOPMainNodes().clone());
-    clonedTruck.setTruckNum(this.getTruckNum());
-    clonedTruck.isTeamMember = this.isTeamMember;
-    clonedTruck.setTruckType((TOPTruckType)this.getTOPTruckType().clone());
+	    clonedTruck.setAttributes((TOPAttributes)this.getAttributes().clone());
+	    clonedTruck.setDepotX(this.getDepotX());
+	    clonedTruck.setDepotY(this.getDepotY());
+	    clonedTruck.endDepotX = this.endDepotX;
+	    clonedTruck.endDepotY = this.endDepotY;
+	    clonedTruck.setMainNodes((TOPNodesLinkedList)this.getTOPMainNodes().clone());
+	    clonedTruck.setTruckNum(this.getTruckNum());
+	    clonedTruck.isTeamMember = this.isTeamMember;
+	    if(this.getTruckType() != null) {
+	    	clonedTruck.setTruckType((TOPTruckType)this.getTruckType().clone());
+	    }
+	    else {
+	    	clonedTruck.setTruckType(new TOPTruckType());
+	    }
+	    return clonedTruck;
+	  }
 
-    return clonedTruck;
-  }
+public int getSecondDepotID() {
+	return secondDepotID;
+}
 
-  /**
-   * Returns whether or not the truck is empty
-   * @return true - the bus is empty, false - the bus is not empty
-   */
-  public boolean isEmpty() {
-    int size = 0;
-    TOPNodes cell = this.getTOPMainNodes().getTOPHead();
-    TOPNodes temp = cell;
-
-    while (cell != null) {
-      size++;
-      cell = cell.getTOPNext();
-      if (cell == temp) {
-	break;
-      }
-    }
-
-    if ( (getMainNodes() == null) || (size <= 2)) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
 }

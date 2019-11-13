@@ -2,7 +2,10 @@ package edu.sru.thangiah.zeus.top;
 
 //import the parent class
 import edu.sru.thangiah.zeus.core.TruckLinkedList;
+import edu.sru.thangiah.zeus.core.Attributes;
 import edu.sru.thangiah.zeus.core.Settings;
+import edu.sru.thangiah.zeus.core.Truck;
+import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
 
 /**
  *
@@ -11,178 +14,242 @@ import edu.sru.thangiah.zeus.core.Settings;
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: </p>
  * @author Sam R. Thangiah
- * Modified to handle TOPs by Peter Schallot.
  * @version 2.0
  */
+
 public class TOPTruckLinkedList
-    extends TruckLinkedList implements java.io.Serializable, java.lang.Cloneable {
-  public static final long serialVersionUID = 1;
-private TOPTruck head;
-private TOPTruck tail;
+    extends TruckLinkedList
+    implements java.io.Serializable, java.lang.Cloneable {
 
-  /**
-   * Constructor
-   */
-  public TOPTruckLinkedList() {
-    //Assign the attributes
-	  setHead(new TOPTruck()); //header node for head
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Constructor
+	 */
+	public TOPTruckLinkedList()
+	{
+		//Housekeeping for the linked list
+		setHead(new TOPTruck()); //header node for head
 		setTail(new TOPTruck()); //tail node for tail
-		linkHeadTail();			  //point head and tail to each other 
-    setAttributes(new TOPAttributes());
-  }
+		linkHeadTail();			  //point head and tail to each other
+		
+		//Assign the attributes	
+		setAttributes(new TOPAttributes());
+	}
 
-  /**
+	/**
    * Returns the first truck in the linked list
    * @return first truck
    */
-  public TOPTruck getTOPHead() {
-    return (TOPTruck)getHead();
+  public TOPTruck getHead() {
+    return (TOPTruck) super.getHead();
+  }
+  
+  public TOPTruck find(int truckNum) {
+	  TOPTruck currentTruck = getHead();
+
+	    while (currentTruck != null) {
+	      if (currentTruck.getTruckNum() == truckNum) {
+	        return currentTruck;
+	      }
+	      currentTruck = currentTruck.getTOPNext();
+	    }
+	    return null;
+	  }
+  
+  /**
+   * Returns the tail node truck in the linked list
+   * @return first truck
+   */
+  public TOPTruck getTail() {
+    return (TOPTruck) super.getTail();
   }
 
-  /**
-   * Returns the last truck in the linked list
-   * @return last truck
-   */
-  public TOPTruck getTOPTail() {
-    return (TOPTruck)getTail();
-  }
-
-  /**
-   * Sets the head truck in the linked list
-   * @param head TOPTruck
-   */
-  public void setTOPHead( TOPTruck head){
-    this.head = head;
-  }
-
-  /**
-   * Sets the last truck in the linked list
-   * @param tail TOPTruck
-   */
-  public void setTOPTail(TOPTruck tail){
-    this.tail = tail;
-  }
-
-  /**
-   * Returns the truck linked lists's attributes
-   * @return TOPAttributes
-   */
   public TOPAttributes getTOPAttributes() {
-    return (TOPAttributes)getAttributes();
-  }
-
+	    return (TOPAttributes)getAttributes();
+	  }
+  public TOPTruck getTOPHead() {
+	    return (TOPTruck)getHead();
+	  }
   /* Will insert a truck into the truck's linked list
    * @param truck the truck to insert
    * @return if it was inserted or not
    */
-  public boolean insertTruck(TOPTruck truck) {
-    TOPTruck currentTruck = getTOPHead();
+ /* public boolean insertTruck(TOPTruck truck) {
+    TOPTruck currentTruck = (TOPTruck)super.getHead();
 
     truck.setPrev(null);
     truck.setNext(null);
 
-    if (head == null) {
+    if (getHead() == null) {
       //no buses exist in list, insert at head
-      tail = head = truck;
+      setTail(truck);
+      setHead(truck);
 
       return true;
     }
     else {
       //at least head and last buses exist, loop to find insertion
-      currentTruck = this.getTOPHead().getTOPNext();
+      currentTruck = (TOPTruck) getHead().getNext();
 
       while (currentTruck != null) {
-	if (truck.getTruckNum() < currentTruck.getTruckNum()) {
-	  currentTruck.getTOPPrev().setNext(truck);
-	  truck.setPrev(currentTruck.getTOPPrev());
-	  truck.setNext(currentTruck);
-	  currentTruck.setPrev(truck);
+        if (truck.getTruckNum() < currentTruck.getTruckNum()) {
+          currentTruck.getPrev().setNext(truck);
+          truck.setPrev(currentTruck.getPrev());
+          truck.setNext(currentTruck);
+          currentTruck.setPrev(truck);
 
-	  return true;
-	}
-	currentTruck = currentTruck.getTOPNext();
+          return true;
+        }
+        currentTruck = (TOPTruck) currentTruck.getNext();
       }
     }
     //put the bus at the end
-    tail.setNext(truck);
-    truck.setPrev(tail);
-    tail = truck;
+    getTail().setNext(truck);
+    truck.setPrev(getTail());
+    setTail(truck);
 
     return true; //bus is always inserted
   }
-
+*/
   /**
-   * Attempts to insert the shipment into one of the trucks
-   * @param theShipment TOPShipment
-   * @return boolean
+   * Attempts to insert a shipment into the Truck linked list. Will attempt
+   * to insert the shipment into each truck until one is found that can
+   * accomodate the shipment
+   * @param theShipment the shipment to insert
+   * @return true if shipment serviced by a truck, false if not.
    */
   public boolean insertShipment(TOPShipment theShipment) {
-    boolean status;
-    TOPTruck currentTruck, newTruck;
+	    boolean status = false;
+	    //int loopCount=0;
 
-    status = false;
-    currentTruck = getTOPHead();
-    while ((currentTruck != null) && (status == false)) {
-      status = currentTruck.getTOPMainNodes().insertShipment(theShipment);
+	    TOPTruck truck = (TOPTruck)this.getHead().getNext();
+	    System.out.println(truck.getTruckNum() + " truck num");
+	    //loopCount = 1;
+	    while (truck != this.getTail()) {
+	    	System.out.println(theShipment.getIndex() + " Shipment to insert");
+	    	if(theShipment.getIndex() != -1)
+	      if (truck.compatableWith(theShipment)) {
 
-      if (status == false) {
-	currentTruck = currentTruck.getTOPNext();
-      }
-    }
+	        status = truck.getTOPMainNodes().insertShipment(theShipment);
 
-    //can we create new trucks?
-    if ((status == false) && (Settings.lockTrucks == false)) {
-      newTruck = new TOPTruck((TOPTruckType)TOPProblemInfo.truckTypes.get(0), TOPProblemInfo.startXCoord,
-                              TOPProblemInfo.startYCoord, TOPProblemInfo.endXCoord, TOPProblemInfo.endYCoord);
+	        // break out of the loop if a good truck is found.
+	        if (status) {
+	          break;
+	        }
+	      }
 
-      //attempt to put this shipment into the new truck
-      status = newTruck.getTOPMainNodes().insertShipment(theShipment);
+	      truck = (TOPTruck) truck.getNext();
+	      //System.out.println("Loop count in insert "+loopCount++);
+	    }
+	   
+	    //can we create new trucks?
+	    if ( (status == false) && (Settings.lockTrucks == false)) {
+	    /** @todo  Is this really needed */
+	     //create a pointer to the last truck for reference
+	      TOPTruck last = (TOPTruck)this.getTail().getPrev();
+	      TOPTruck first = (TOPTruck)this.getHead();
 
-      if (status == true) {
-        this.insertTruck(newTruck);
-      }
-    }
+	      //loop to find the correct truck type for this customer
+	      for (int i = 0; i < ZeusProblemInfo.getTruckTypesSize(); i++) {
+	        TOPTruckType type = (TOPTruckType) ZeusProblemInfo.getTruckTypesAt(i);
 
-    return status;
-  }
+	        if (type.getServiceType().equals(theShipment.getTruckTypeNeeded())) {
+	          //create a new truck with the truck number of the last + 1, the matching truck type
+	          //and use the first customer in the last truck (the depot) to get the depot x,y
+	        	//If it is set to null, it w
+	          //TOPTruck newTruck = null;
+	        	/*TOPTruck newTruck    = new TOPTruck(type,
+	                                           last.getMainNodes().getHead().getNext().
+	                                           getShipment()
+	                                           .getXCoord(),
+	                                           last.getMainNodes().getHead().getNext().
+	                                           getShipment()
+	                                           .getYCoord());*/
+	          
+	        	TOPTruck newTruck;
+	        	if(first.getTOPNext().getRouteToOriginal())
+	        	{
+	            	newTruck    = new TOPTruck(type,
+	                        first.getNext().getDepotX(),
+	                        first.getNext().getDepotY());
+	        	}
+	        	else
+	        	{     
+	            	newTruck    = new TOPTruck(type,
+	                        first.getNext().getDepotX(),
+	                        first.getNext().getDepotY(), 
+	                        first.getTOPNext().getSecondDepotID(),
+	                        first.getTOPNext().getSecondDepotX(),
+	                        first.getTOPNext().getSecondDepotY());
+	        	}
+	        	
+
+	          //attempt to put this shipment into the new truck
+	          status = newTruck.getTOPMainNodes().insertShipment(theShipment);
+
+	          if (status == true) {
+	            //the customer was inserted to the new truck, so insert the new truck to the linked list
+	        	 System.out.println("** Inserting new Truck");
+	        	 System.out.println("Depot x and y is:"+ first.getNext().getDepotX()+" "+first.getNext().getDepotY());
+	            this.insertTruckLast(newTruck);
+
+	            return status;
+	          }
+	          else {
+	            //customer could not be inserted into the new truck so return false
+	            //and dont insert the new truck into the linked list (garbage collector
+	            //will delete it)
+	            return status;
+	          }
+	        }
+	      }
+	    }
+
+	    return status;
+	  }
 
   /**
    * Returns a clone of this object
    * @return Object clone
    */
   public Object clone() {
-    TOPTruckLinkedList clonedTruckLinkedList = new TOPTruckLinkedList();
+	    TOPTruckLinkedList clonedTruckLinkedList = new TOPTruckLinkedList();
 
-    clonedTruckLinkedList.setAttributes((TOPAttributes)this.getTOPAttributes().clone());
-    if (this.getTOPHead() != null) {
-      clonedTruckLinkedList.head = (TOPTruck)this.getTOPHead().clone();
+	    clonedTruckLinkedList.setAttributes((TOPAttributes)this.getTOPAttributes().clone());
+	    if (this.getTOPHead() != null) {
+	      clonedTruckLinkedList.setHead((TOPTruck)this.getHead().clone());
 
-      if (this.head != this.tail) {
-        TOPTruck currentTruck = clonedTruckLinkedList.getTOPHead();
-        TOPTruck nextTruck = this.getTOPHead().getTOPNext();
+	      if (this.getHead() != this.getTail()) {
+	        TOPTruck currentTruck = (TOPTruck) clonedTruckLinkedList.getTOPHead();
+	        TOPTruck nextTruck = (TOPTruck) this.getTOPHead().getTOPNext();
 
-        while (nextTruck != null) {
-          currentTruck.setNext( (TOPTruck)nextTruck.clone()); //create the next depot
-          currentTruck.getTOPNext().setPrev(currentTruck); //set the next depot's prev
-          currentTruck = currentTruck.getTOPNext();
-          nextTruck = nextTruck.getTOPNext();
+	        while (nextTruck != null) {
+	          currentTruck.setNext( (TOPTruck)nextTruck.clone()); //create the next depot
+	          currentTruck.getTOPNext().setPrev(currentTruck); //set the next depot's prev
+	          currentTruck = (TOPTruck) currentTruck.getTOPNext();
+	          nextTruck = (TOPTruck) nextTruck.getTOPNext();
 
-          //once next is null, we have found the tail of the list
-          if (nextTruck == null) {
-            clonedTruckLinkedList.tail = currentTruck;
-            currentTruck.setNext(null);
-          }
-        }
-      }
-      else { //only 1 truck
-        clonedTruckLinkedList.tail = clonedTruckLinkedList.head;
-      }
-    }
-    else {
-      clonedTruckLinkedList.head = null;
-      clonedTruckLinkedList.tail = null;
-    }
+	          //once next is null, we have found the tail of the list
+	          if (nextTruck == null) {
+	            clonedTruckLinkedList.setTail(currentTruck);
+	            currentTruck.setNext(null);
+	          }
+	        }
+	      }
+	      else { //only 1 truck
+	        clonedTruckLinkedList.setTail(clonedTruckLinkedList.getHead());
+	      }
+	    }
+	    else {
+	      clonedTruckLinkedList.setHead(null);
+	      clonedTruckLinkedList.setTail(null);
+	    }
 
-    return clonedTruckLinkedList;
-  }
+	    return clonedTruckLinkedList;
+	  }
+
 }

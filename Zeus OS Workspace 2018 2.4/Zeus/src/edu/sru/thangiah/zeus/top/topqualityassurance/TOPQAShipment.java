@@ -15,6 +15,7 @@ import edu.sru.thangiah.zeus.qualityassurance.*;
 public class TOPQAShipment
     extends QAShipment
     implements java.io.Serializable, java.lang.Cloneable {
+	private int shipmentScoreValue;
   public TOPQAShipment() {
   }
 }

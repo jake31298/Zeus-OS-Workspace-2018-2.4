@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
     <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.top.TOPRoot"/>
-    <fullyQualifiedTypeName name="com.sun.rowset.internal.Row"/>
-    <fullyQualifiedTypeName name="org.apache.poi.ss.usermodel.Row"/>
-    <fullyQualifiedTypeName name="org.apache.poi.ss.usermodel.Cell"/>
-    <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.core.XMLFileReader"/>
-    <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.core.CostFunctions"/>
-    <fullyQualifiedTypeName name="org.apache.poi.openxml4j.exceptions.InvalidFormatException"/>
-    <fullyQualifiedTypeName name="java.io.Console"/>
-    <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.core.Shipment"/>
+    <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.core.ZeusProblemInfo"/>
 </qualifiedTypeNameHistroy>

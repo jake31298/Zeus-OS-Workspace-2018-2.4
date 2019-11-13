@@ -2,6 +2,7 @@ package edu.sru.thangiah.zeus.top.topqualityassurance;
 
 import edu.sru.thangiah.zeus.core.*;
 import edu.sru.thangiah.zeus.qualityassurance.*;
+import java.math.BigDecimal;
 
 /**
  *
@@ -12,6 +13,7 @@ import edu.sru.thangiah.zeus.qualityassurance.*;
  * @author Sam R. Thangiah
  * @version 2.0
  */
+/** @todo Need to document the variables and the parameters */
 public class TOPQATruck
     extends QATruck
     implements java.io.Serializable, java.lang.Cloneable {
@@ -20,7 +22,7 @@ public class TOPQATruck
   }
 
   public boolean checkDistanceConstraint(TOPQATruck truck) {
-    boolean isDiagnostic = false;
+    boolean isDiagnostic = true;
     boolean status = true;
     double totalDistance = 0;
     double distance = 0;
@@ -33,7 +35,8 @@ public class TOPQATruck
 
     if (isDiagnostic) {
       System.out.println();
-      System.out.println("Truck being evaluated is " + truck.getIndex() + " with " + getNodes().size() + " nodes");
+      System.out.println("Truck being evaluated is " + truck.getIndex() + " with " +
+    		  getNodes().size() + " nodes");
       System.out.println("Sequence of the route is:");
       for (int i = 0; i < getNodes().size(); i++) {
         node1 = (TOPQANode) getNodes().elementAt(i);
@@ -45,11 +48,16 @@ public class TOPQATruck
     if (getNodes().size() == 0) {
       return status;
     }
-    node1 = (TOPQANode) getNodes().elementAt(0);
-    //compute the total travel distance of the route
-    for (int i = 1; i < getNodes().size() - 1; i++) {
+    
+    //compute the distance from the depot to the first node
+    node1 = (TOPQANode) getNodes().elementAt(0);   
+    //compute the total travel distance of the nodes in the route
+    for (int i = 1; i < getNodes().size(); i++) {
       node2 = (TOPQANode) getNodes().elementAt(i);
-      distance = (float) Math.sqrt( (double) (((node1.getX() - node2.getX()) * (node1.getX() - node2.getX())) + ( (node1.getY() - node2.getY()) * (node1.getY() - node2.getY()))));
+      distance = (float) Math.sqrt( (double) (node1.getX() - node2.getX())
+                                   * (node1.getX() - node2.getX()) +
+                                   ( (node1.getY() - node2.getY())
+                                    * (node1.getY() - node2.getY())));
       totalDistance += distance;
       if (isDiagnostic) {
         System.out.println("    Distance from " + node1.getIndex() + " to " +
@@ -57,9 +65,15 @@ public class TOPQATruck
       }
       node1 = node2;
     }
-    node2 = (TOPQANode) getNodes().elementAt(0);
-    distance = (float) Math.sqrt( (double) (node1.getX() - node2.getX())  * (node1.getX() - node2.getX()) + ((node1.getY() - node2.getY()) * (node1.getY() - node2.getY())));
+    
+    //last depot to the node is not computed - might want to compute it
+    /*node2 = (TOPQANode) getNodes().elementAt(0);
+    distance = (float) Math.sqrt( (double) (node1.getX() - node2.getX())
+                                 * (node1.getX() - node2.getX()) +
+                                 ( (node1.getY() - node2.getY())
+                                  * (node1.getY() - node2.getY())));
     totalDistance += distance;
+    */
 
     //Convert the distance to integer values for comparison. The convertion
     //takes up to a precison of 3 decimal places. Comapring floats can lead
@@ -69,21 +83,28 @@ public class TOPQATruck
     intDistance2 = (int) (totalDistance * 1000);
 
     if (isDiagnostic) {
-      System.out.println("    Distance from " + node1.getIndex() + " to " +
-                         node2.getIndex() + " = " + truck.getDistance());
-      System.out.println("   Truck distance " + truck.getDistance() + " : Computed distance " + totalDistance);
+      //System.out.println("    Distance from " + node1.getIndex() + " to " +
+      //                   node2.getIndex() + " = " + truck.getDistance());
+      System.out.println("   Truck distance " + truck.getDistance() +
+                         " : Computed distance " + totalDistance);
 
     }
 
     //Check if the computed distances are the same
     if (intDistance1 != intDistance2) {
-      Settings.printDebug(Settings.ERROR, "Truck # " + truck.getIndex() + " distance does not match computed distance " + truck.getDistance() + " " + totalDistance);
+      Settings.printDebug(Settings.ERROR,
+                          "Truck # " + truck.getIndex() +
+                          " distance does not match computed distance " +
+                          truck.getDistance() + " " + totalDistance);
       status = false;
       return status;
     }
     //check if it exceeds the maximum distance
     if (totalDistance > truck.getMaxDistance()) {
-      Settings.printDebug(Settings.ERROR, "Truck # " + truck.getIndex() + "distance does exceeds maximum distance " + totalDistance + " " + getMaxDistance());
+      Settings.printDebug(Settings.ERROR,
+                          "Truck # " + truck.getIndex() +
+                          "distance does exceeds maximum distance " +
+                          totalDistance + " " + getMaxDistance());
       status = false;
       return status;
     }
@@ -91,7 +112,7 @@ public class TOPQATruck
   }
 
   public boolean checkCapacityConstraint(TOPQATruck truck) {
-    boolean isDiagnostic = false;
+    boolean isDiagnostic = true;
     boolean status = true;
     double totalCapacity = 0;
     double capacity = 0;
@@ -102,7 +123,8 @@ public class TOPQATruck
 
     if (isDiagnostic) {
       System.out.println();
-      System.out.println("Truck being evaluated is " + truck.getIndex() + " with " + getNodes().size() + " nodes");
+      System.out.println("Truck being evaluated is " + truck.getIndex() + " with " +
+                         getNodes().size() + " nodes");
       System.out.println("Sequence of the route is:");
       for (int i = 0; i < getNodes().size(); i++) {
         node = (TOPQANode) getNodes().elementAt(i);
@@ -115,11 +137,12 @@ public class TOPQATruck
       return status;
     }
     //compute the total capacity of the route
-    for (int i = 1; i < getNodes().size() - 1; i++) {
+    for (int i = 1; i < getNodes().size(); i++) {
       node = (TOPQANode) getNodes().elementAt(i);
       capacity = node.getDemand();
       if (isDiagnostic) {
-        System.out.println("    Capacity " + node.getIndex() + " is " + +capacity);
+        System.out.println("    Capacity " + node.getIndex() + " is " +
+                           +capacity);
       }
       totalCapacity += capacity;
     }
@@ -132,17 +155,24 @@ public class TOPQATruck
     intCap2 = (int)(totalCapacity *1000);
 
     if (isDiagnostic) {
-      System.out.println("   Truck capacity " + truck.getDemand() + " : Computed capacity " + totalCapacity);
+      System.out.println("   Truck capacity " + truck.getDemand() +
+                         " : Computed capacity " + totalCapacity);
     }
     //Check if the truck capacity is the same as the computed capacity
     if (intCap1 != intCap2) { //check up to 3 decimal placess
-      Settings.printDebug(Settings.ERROR, "Truck # " + truck.getIndex() + " capacity does not match computed capacity " + truck.getDemand() + " " + totalCapacity);
+      Settings.printDebug(Settings.ERROR,
+                          "Truck # " + truck.getIndex() +
+                          " capacity does not match computed capacity " +
+                          truck.getDemand() + " " + totalCapacity);
       status = false;
       return status;
     }
     //check if it exceeds the maximum capacity
     if (totalCapacity > truck.getMaxDemand()) {
-      Settings.printDebug(Settings.ERROR, "Truck # " + truck.getIndex() + "distance exceeds maximum capacity " + totalCapacity + " " + truck.getMaxDemand());
+      Settings.printDebug(Settings.ERROR,
+                          "Truck # " + truck.getIndex() +
+                          "distance exceeds maximum capacity " +
+                          totalCapacity + " " + truck.getMaxDemand());
       status = false;
       return status;
     }
