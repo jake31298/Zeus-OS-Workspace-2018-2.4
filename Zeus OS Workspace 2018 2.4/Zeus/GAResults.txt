@@ -1,0 +1,1 @@
+|File=PROB4-4-d.PRN.xlsx|numTargetAreas=16|overMaxDistanceCostPenalty=1.9612749453104072|targetPointDistanceFactor=0.20875811294083876|maxDistanceBuffer=1.207232921777373|targetEllipseSizeFactor=0.32081066159227073|initialAngle=2.067329710110915

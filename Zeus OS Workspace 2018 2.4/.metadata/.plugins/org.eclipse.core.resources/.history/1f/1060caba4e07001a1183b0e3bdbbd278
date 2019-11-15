@@ -1,0 +1,70 @@
+package edu.sru.thangiah.zeus.top;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import edu.sru.thangiah.zeus.core.ZeusProblemInfo;
+import edu.sru.thangiah.zeus.simplega.sGA;
+import edu.sru.thangiah.zeus.top.topcostfunctions.*;
+
+public class TOPRoot {
+  /**
+   * Constructor. Runs the TOP and calculates the total CPU time
+ * @throws FileNotFoundException 
+   */
+  public TOPRoot() {
+
+    //Settings for the ProblemInfo class
+    //Problem info consists of a set of static values that are used by a number
+    //of different classes. The following has to be set in order for the program
+    //to function correctly.
+    ZeusProblemInfo.setNodesLLLevelCostF( new TOPNodesLLCostFunctions());
+    ZeusProblemInfo.setTruckLevelCostF( new TOPTruckCostFunctions());
+    ZeusProblemInfo.setTruckLLLevelCostF(new TOPTruckLLCostFunctions());
+    ZeusProblemInfo.setDepotLevelCostF(new TOPDepotCostFunctions());
+    ZeusProblemInfo.setDepotLLLevelCostF(new TOPDepotLLCostFunctions());
+    
+    //Paths for temporary, input and output files
+    //ProblemInfo.currDir gives the working directory of the program
+    //The working directory is automatically added to the path - ZeusProblemInfo.getWorkingDirectory()"\\"+
+    ZeusProblemInfo.setTempFileLocation("temp");
+    ZeusProblemInfo.setInputPath("data\\TOP\\Problems\\");
+    ZeusProblemInfo.setOutputPath("data\\TOP\\Results\\");
+    
+  //Choose the problem-solving parameters (if the GA is enabled, these values will be overwritten)
+    TOPProblemInfo.setNumTargetAreas(25);
+    TOPProblemInfo.setTargetPointDistanceFactor(0.0);
+    TOPProblemInfo.setTargetEllipseSizeFactor(1.0);
+    TOPProblemInfo.setMaxDistanceBuffer(1.2);
+    TOPProblemInfo.setOverMaxDistanceCostPenalty(1.2);
+    TOPProblemInfo.setCostType(TOPProblemInfo.getCostType());
+    TOPProblemInfo.setInitialAngle(0.0);
+    
+    
+    TOPProblemInfo.setEnableGUI(true);
+    TOPProblemInfo.setEnableGA(false);
+    TOPProblemInfo.setEnableOptimizations(true);
+    
+   //For testing only, reads a single problem file
+   //Run single problem
+   //for(int i = 0; i < 5; i++)
+   
+   	new TOP("PROB1-2-b.PRN.xlsx");
+    TOPProblemInfo.setGAPopulationSize(1);
+    if (TOPProblemInfo.getEnableGA()) {
+    	new sGA("PROB4-4-d.PRN.xlsx");
+    }
+   	
+    
+    //adds every filename in the \data directory to the listOfFiles array, 
+    //iterates through the array, and creates a TOP for each file
+   /* File folder = new File(ZeusProblemInfo.getInputPath());
+	File[] listOfFiles = folder.listFiles();
+	for (File file : listOfFiles) {
+		if (file.isFile()) {
+			for(int i = 0; i < 5; i++)
+				new TOP(file.getName(),i);
+		}
+	}*/
+  }
+}

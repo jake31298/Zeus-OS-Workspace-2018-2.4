@@ -30,17 +30,35 @@ public class TOPRoot {
     ZeusProblemInfo.setTempFileLocation("temp");
     ZeusProblemInfo.setInputPath("data\\TOP\\Problems\\");
     ZeusProblemInfo.setOutputPath("data\\TOP\\Results\\");
-    //For testing only, reads a single problem file
     
+  //Choose the problem-solving parameters (if the GA is enabled, these values will be overwritten)
+    TOPProblemInfo.setNumTargetAreas(25);
+    TOPProblemInfo.setTargetPointDistanceFactor(0.0);
+    TOPProblemInfo.setTargetEllipseSizeFactor(1.0);
+    TOPProblemInfo.setMaxDistanceBuffer(1.2);
+    TOPProblemInfo.setOverMaxDistanceCostPenalty(1.2);
+    TOPProblemInfo.setCostType(TOPProblemInfo.getCostType());
+    TOPProblemInfo.setInitialAngle(0.0);
+    
+    
+    TOPProblemInfo.setEnableGUI(true);
+    TOPProblemInfo.setEnableGA(false);
+    TOPProblemInfo.setEnableOptimizations(true);
+    
+   String problem = "PROB4-2-b.PRN.xlsx";
+    //For testing only, reads a single problem file
    //Run single problem
-   //for(int i = 0; i < 5; i++)
-   	new TOP("PROB4-4-d.PRN.xlsx");
-    //TOPProblemInfo.setGAPopulationSize(1);
-   	//new sGA("PROB4-3-l.PRN.xlsx");
+   
+   	new TOP(problem);
+    TOPProblemInfo.setGAPopulationSize(1);
+    if (TOPProblemInfo.getEnableGA()) {
+    	new sGA(problem);
+    }
+   	
     
     //adds every filename in the \data directory to the listOfFiles array, 
     //iterates through the array, and creates a TOP for each file
-    /*File folder = new File(ZeusProblemInfo.getInputPath());
+   /* File folder = new File(ZeusProblemInfo.getInputPath());
 	File[] listOfFiles = folder.listFiles();
 	for (File file : listOfFiles) {
 		if (file.isFile()) {

@@ -54,6 +54,7 @@ public class TOP {
 	// private Vector<TOPOptEntry> mainOpts; //Contains the collections of
 	// optimizations
 	private Vector<String> optInformation; // Contains information about routes
+	private Vector mainOpts = new Vector();
 	private TOPShipmentLinkedList mainShipments; // Customers read in from a file or database that are available
 	private TOPDepotLinkedList mainDepots; // Depots linked list for the TOP problem
 	private TOPQualityAssurance TOPQA; // Check the integrity and quality of the solution
@@ -80,29 +81,25 @@ public class TOP {
 		double targetX, targetY, tempX; // Coordinates of the target point
 		OptInfo opInfo;
 
-		int dataSet = 7;
-		int truckCount = 4;
-		char constraint = 't';
-		boolean routeToOriginal = false;
-		TOPProblemInfo.setNumTargetAreas(25);
+		String filePath;
+		String dataFile;
+		String outFile;
+		int truckCount = 0;
 
-		String outFile = "TOP" + dataSet + "." + truckCount + "." + constraint;
-		String constraintFile = "constraints\\TOP" + dataSet + "." + truckCount + "People.xlsx";
-
-		dataFile = fileName;
-		String filePath = ZeusProblemInfo.getInputPath();// ".\\/data/TOP/Problems/";
-		// mainOpts = new Vector();
 		optInformation = new Vector<String>();
 		mainShipments = new TOPShipmentLinkedList();
 		mainDepots = new TOPDepotLinkedList();
 
+		// Set needed file paths into variables
+		dataFile = fileName;
+		filePath = ZeusProblemInfo.getInputPath();// ".\\/data/TOP/Problems/";
+
 		// read in the TOP data
-		// readDataFromFile(TOPProblemInfo.inputPath + dataFile);
-		// readShipmentsDataFromExcelFile(filePath + dataFile, filePath +
-		// constraintFile, constraint, truckCount, routeToOriginal);
-		readDataFromExcelFile(ZeusProblemInfo.getInputPath() + dataFile);
-		Settings.printDebug(Settings.COMMENT, "Read Data File: " + ZeusProblemInfo.getInputPath() + dataFile);
-		// writeDataFile(dataFile.substring(dataFile.lastIndexOf("/") + 1));
+		readDataFromExcelFile(filePath + dataFile);
+		Settings.printDebug(Settings.COMMENT, "Read Data File: " + filePath + dataFile);
+		//
+		truckCount = ZeusProblemInfo.getNoOfVehs();
+		outFile = "TOP" + fileName + "." + truckCount;
 		writeDataToFileExcel(outFile);
 
 		// Ensure that the shipment linked list has been loaded with the data
@@ -115,26 +112,6 @@ public class TOP {
 		} else {
 			// If optimizations are enabled, create a list of them to be run
 			if (TOPProblemInfo.isEnableOptimizations() == true) {
-				// mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()),
-				// TOPProblemInfo.TOPCostType.SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new FirstFirstInterSearch(new Exchange01()),
-				// TOPCostType.SCORE_INVERSE));
-
-				// mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new TOPReduction(),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new TOPReduction(),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new OneOpt()),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-				// mainOpts.add(new TOPOptEntry(new FirstFirstIntraSearch(new TwoOpt()),
-				// TOPProblemInfo.TOPCostType.DISTANCE_PLUS_DISTANCE_TIMES_SCORE_INVERSE));
-
 			}
 
 			// Set up the shipment insertion type
@@ -158,13 +135,13 @@ public class TOP {
 			// distance
 			mainDepots.markUnreachableShipments(mainShipments);
 
-			// Generate solutions for each target area, keeping track of the overall best
-			// solution
+			// Generate solutions for each target area, keeping track of the overall best solution
 			bestMainShipments = new TOPShipmentLinkedList();
 			resetMainShipments = (TOPShipmentLinkedList) mainShipments.clone();
 			bestMainDepots = new TOPDepotLinkedList();
 			resetMainDepots = (TOPDepotLinkedList) mainDepots.clone();
 			bestScore = 0.0f;
+			
 			for (int i = 0; i < TOPProblemInfo.getNumTargetAreas(); i++) {
 				// Set up the shipment selection type
 				secondarySelectType = new HighestDemandInReachableArea();
@@ -190,18 +167,15 @@ public class TOP {
 				maintainFeasibility();
 
 				// If this is the best solution so far, save it
-				if ((TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(mainDepots) > bestScore)
-						|| (bestScore == 0.0)) {
+				if ((TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(mainDepots) > bestScore)|| (bestScore == 0.0)) {
 					bestScore = TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(mainDepots);
 					bestMainDepots = (TOPDepotLinkedList) mainDepots.clone();
 					bestMainShipments = (TOPShipmentLinkedList) mainShipments.clone();
 				}
 
 				// Move the target area for the next pass
-				tempX = (float) ((targetX * Math.cos(angleBetweenPasses)) - (targetY * Math.sin(angleBetweenPasses)))
-						- TOPProblemInfo.getStartXCoord();
-				targetY = (float) ((targetX * Math.sin(angleBetweenPasses)) + (targetY * Math.cos(angleBetweenPasses)))
-						- TOPProblemInfo.getStartYCoord();
+				tempX = (float) ((targetX * Math.cos(angleBetweenPasses)) - (targetY * Math.sin(angleBetweenPasses))) - TOPProblemInfo.getStartXCoord();
+				targetY = (float) ((targetX * Math.sin(angleBetweenPasses)) + (targetY * Math.cos(angleBetweenPasses))) - TOPProblemInfo.getStartYCoord();
 				targetX = tempX;
 
 				// Reset mainDepots and mainShipments for the next pass
@@ -217,8 +191,7 @@ public class TOP {
 		// Capture the CPU time required for solving the problem
 		endTime = System.currentTimeMillis();
 
-		// Only perform these steps if the GA is disabled. If it is enabled, these steps
-		// will
+		// Only perform these steps if the GA is disabled. If it is enabled, these steps will
 		// be performed at the very end by the GA class
 		if (TOPProblemInfo.getEnableGA() == false) {
 			// Run quality assurance on the solution
@@ -231,7 +204,7 @@ public class TOP {
 			// Write solution files with Excel
 			writeLongSolutionExcel(outFile);
 			writeShortSolutionExcel(outFile);
-			writeComparisonExcel(dataSet, truckCount, constraint, filePath);
+			writeComparisonExcel(filePath, truckCount);
 
 			// Display the score
 			Settings.printDebug(Settings.COMMENT, "Total Score: " + getTotalScore());
@@ -312,7 +285,8 @@ public class TOP {
 		// algorithm
 		TOPProblemInfo.setSelectShipType(secondarySelectType);
 		while (mainShipments.isAllShipsAssignedOrUnreachable() == false) {
-			currentShipment = mainShipments.getNextInsertShipment(mainDepots, mainDepots.getStartingDepot(), mainShipments, null);
+			currentShipment = mainShipments.getNextInsertShipment(mainDepots, mainDepots.getStartingDepot(),
+					mainShipments, null);
 
 			// If the shipment is null, print error message
 			if (currentShipment.getIndex() == -1) {
@@ -367,7 +341,7 @@ public class TOP {
 	 * @param truckCount
 	 * @param constraint
 	 */
-	public void writeComparisonExcel(int dataSet, int truckCount, int constraint, String filePath) {
+	public void writeComparisonExcel(String filePath, int truckCount) {
 		String selectShipType = ZeusProblemInfo.getSelectShipType().toString();
 		selectShipType = selectShipType.substring(selectShipType.lastIndexOf('.') + 1, selectShipType.lastIndexOf('@'));
 		System.out.println("Problem Type " + selectShipType);
@@ -379,9 +353,9 @@ public class TOP {
 			XSSFWorkbook dataWorkbook = new XSSFWorkbook(dataInputStream);
 			XSSFSheet dataWorksheet = dataWorkbook.getSheetAt(0);
 
-			Cell cell = dataWorksheet.getRow(((dataSet - 1) * 3) + truckCount - 1)
-					.getCell(Character.getNumericValue(constraint) - 9);
-			cell.setCellValue(mainDepots.getTOPHead().getNext().getAttributes().getTotalDemand());
+			// Cell cell = dataWorksheet.getRow(((dataSet-1)*3) +
+			// truckCount-1).getCell(Character.getNumericValue(constraint) - 9);
+			// cell.setCellValue(mainDepots.getTOPHead().getNext().getAttributes().getTotalDemand());
 
 			FileOutputStream fileOut = new FileOutputStream(file);
 			dataWorkbook.write(fileOut);
@@ -435,15 +409,15 @@ public class TOP {
 							} else {
 								try {
 
-									String knownBestFile = filePath + "knownBest.xlsx";
-
-									FileInputStream knownBestFileStream = new FileInputStream(knownBestFile);
-									XSSFWorkbook knownBestFileWorkbook = new XSSFWorkbook(knownBestFileStream);
-									XSSFSheet knownBestFileWorksheet = knownBestFileWorkbook.getSheetAt(0);
-
-									row.createCell(j)
-											.setCellValue(knownBestFileWorksheet.getRow(i).getCell(j).toString());
-
+//									String knownBestFile = ZeusProblemInfo.getInputPath() + "knownBest.xlsx";							
+//										
+//									FileInputStream knownBestFileStream = new FileInputStream(knownBestFile);
+//									XSSFWorkbook knownBestFileWorkbook = new XSSFWorkbook(knownBestFileStream);
+//									XSSFSheet knownBestFileWorksheet = knownBestFileWorkbook.getSheetAt(0);
+//									
+//
+//									row.createCell(j).setCellValue(knownBestFileWorksheet.getRow(i).getCell(j).toString());
+//									
 								} catch (Exception exception) {
 									exception.printStackTrace();
 								}
@@ -486,7 +460,7 @@ public class TOP {
 				FileOutputStream fileOut = new FileOutputStream(file);
 				workbook.write(fileOut);
 
-				writeComparisonExcel(dataSet, truckCount, constraint, filePath);
+				writeComparisonExcel(filePath, truckCount);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -1045,17 +1019,28 @@ public class TOP {
 	}
 
 	public void runOptimizations() {
-		/*
-		 * TOPOptEntry opt;
-		 * 
-		 * for (int i = 0; i < mainOpts.size(); i++) { opt = mainOpts.get(i);
-		 * Settings.printDebug(Settings.COMMENT, "Running " + opt);
-		 * 
-		 * optInformation.add(opt.toString() + " " + opt.run(mainDepots));
-		 * 
-		 * Settings.printDebug(Settings.COMMENT, opt.toString() + " Stats: " +
-		 * mainDepots.getSolutionString()); }
-		 */
+		OptInfo info = new OptInfo();
+		for (int i = 0; i < mainOpts.size(); i++) {
+			/* Extract the operator in the vector and convert it into a
+			 SearchStrategy type. The object that is loaded into the
+			 SearchStrategy type is not SearchStrategy as it is an
+			 abstract class but a class that inherits off of
+			 SearchStrategy such as FirstBestIntraOpt, FirstBestInterOpt
+			 and so on. the opt.run method runs the run method
+			 from the inheriting class such as FirstBestIntraOpt.*/
+			SearchStrategy opt = (SearchStrategy) mainOpts.elementAt(i);
+			Settings.printDebug(Settings.COMMENT, "Running " + opt);
+
+			// The opt.run method called is dependent on the object that
+			// was created in the mainOpts. If the object was BestBestIntraSearch
+			// then the run method in BestBestIntraSearch is called.
+			optInformation.add(opt.toString() + " " + opt.run(mainDepots));
+			Settings.printDebug(Settings.COMMENT, opt.toString() + " Stats: " + mainDepots.getSolutionString());
+		}
+		// Calculate the total stats
+		// ProblemInfo.depotLLLevelCostF.calculateTotalsStats(mainDepots);
+		// info.setNewAtributes(mainDepots.getAttributes());
+
 	}
 
 	/**

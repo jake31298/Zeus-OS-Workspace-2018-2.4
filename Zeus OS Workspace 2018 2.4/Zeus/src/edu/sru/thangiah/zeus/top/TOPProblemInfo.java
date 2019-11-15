@@ -34,7 +34,7 @@ public class TOPProblemInfo
   private static double initialAngle;                  //Angle at which the first target area will be generated
 
   private static String scriptFileLocation;            //Directory where Zeus Script Files will be placed
-  private static boolean enableGUI=true;                    //Controls whether the GUI is displayed after a solution is found
+  private static boolean enableGUI;                    //Controls whether the GUI is displayed after a solution is found
   private static boolean enableOptimizations;          //Controls whether or not optimizations are used
   private static boolean enableGA;                     //Controls whether or not genetic algorithms are used
 
@@ -92,6 +92,10 @@ public static int getNumTargetAreas() {
 
 public static boolean getEnableGUI() {
 	return enableGUI;
+}
+
+public static void setEnableGUI(boolean val) {
+	enableGUI = val;
 }
 
 public static void setOverMaxDistanceCostPenalty(double n) {

@@ -1,0 +1,1116 @@
+package edu.sru.thangiah.zeus.top;
+
+import java.io.*;
+import java.util.*;
+import edu.sru.thangiah.zeus.top.topgui.*;
+import edu.sru.thangiah.zeus.top.topqualityassurance.*;
+import edu.sru.thangiah.zeus.core.*;
+import edu.sru.thangiah.zeus.localopts.*;
+import edu.sru.thangiah.zeus.localopts.interopts.FirstFirstInterSearch;
+import edu.sru.thangiah.zeus.localopts.intraopts.*;
+import edu.sru.thangiah.zeus.top.*;
+//import edu.sru.thangiah.zeus.top.TOPProblemInfo.TOPCostType;
+import edu.sru.thangiah.zeus.localopts.interopts.*;
+
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+//For Excel file
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.format.CellDateFormatter;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+//import edu.sru.thangiah.zeus.localopts.*;
+
+/**
+ * <p>
+ * Title:
+ * </p>
+ * TOP in Zeus
+ * <p>
+ * Description:
+ * </p>
+ * Solve Team Orienteering Problems.
+ * <p>
+ * Copyright: Copyright (c) 2007
+ * </p>
+ * <p>
+ * Company:
+ * </p>
+ * 
+ * @author Sam R. Thangiah Modified by Peter Schallot and David Crissman.
+ * @version 2.0
+ */
+public class TOP {
+	private String dataFile; // Filename of the problem to be solved
+	private long startTime, endTime; // Track the CPU processing time
+	// private Vector<TOPOptEntry> mainOpts; //Contains the collections of
+	// optimizations
+	private Vector<String> optInformation; // Contains information about routes
+	private TOPShipmentLinkedList mainShipments; // Customers read in from a file or database that are available
+	private TOPDepotLinkedList mainDepots; // Depots linked list for the TOP problem
+	private TOPQualityAssurance TOPQA; // Check the integrity and quality of the solution
+	private TOPShipmentLinkedList primarySelectType, secondarySelectType; // Used to hold the primary and secondary
+																			// algorithms
+
+	/*
+	 * TOPData data = new TOPData(0, 0, 0, 0, 0, new Vector(), new Vector(), new
+	 * TOPShipmentLinkedList(), new TOPDepotLinkedList());
+	 */
+
+	// so that we can switch between them
+	/**
+	 * Constructor
+	 * 
+	 * @param fileName String Modified by Pete Schallot and David Crissman
+	 */
+	public TOP(String fileName) {
+		float bestScore; // Score of the best solution so far
+		TOPShipmentLinkedList resetMainShipments, bestMainShipments; // Shipment linked list of the best solution
+		TOPDepotLinkedList resetMainDepots, bestMainDepots; // Depot linked list of the best solution
+		double angleBetweenPasses, targetPointDistance, targetEllipseSize; // Information about the target elliptical area
+		double targetX, targetY, tempX; // Coordinates of the target point
+		OptInfo opInfo;
+
+		int dataSet = 7;
+		int truckCount = 4;
+		char constraint = 't';
+		
+		optInformation = new Vector<String>();
+		mainShipments = new TOPShipmentLinkedList();
+		mainDepots = new TOPDepotLinkedList();
+
+		TOPProblemInfo.setNumTargetAreas(10);
+
+		String outFile = "TOP" + dataSet + "." + truckCount + "." + constraint;
+		dataFile = fileName;
+		String filePath = ZeusProblemInfo.getInputPath();// ".\\/data/TOP/Problems/";
+
+		// read in the TOP data
+		readDataFromExcelFile(filePath + dataFile);
+		Settings.printDebug(Settings.COMMENT, "Read Data File: " + filePath + dataFile);
+		// 
+		writeDataToFileExcel(outFile);
+
+		// Ensure that the shipment linked list has been loaded with the data
+		if (mainShipments.getTOPHead() == null) {
+			Settings.printDebug(Settings.ERROR, "TOP: Shipment linked list is empty");
+		} else if (mainDepots.getStartingDepot() == null) {
+			Settings.printDebug(Settings.ERROR, "TOP: Starting depot has not been specified");
+		} else if (mainDepots.getEndingDepot() == null) {
+			Settings.printDebug(Settings.ERROR, "TOP: Ending depot has not been specified");
+		} else {
+			// If optimizations are enabled, create a list of them to be run
+			if (TOPProblemInfo.isEnableOptimizations() == true) {}
+
+			// Set up the shipment insertion type
+			TOPProblemInfo.setInsertShipType(new LinearGreedyInsertShipment());
+			Settings.printDebug(Settings.COMMENT, LinearGreedyInsertShipment.WhoAmI());
+
+			// Capture the CPU time required for solving the problem
+			startTime = System.currentTimeMillis();
+
+			// Calculate the rest of the information about the initial target area
+			angleBetweenPasses = (2.0 * Math.PI) / TOPProblemInfo.getNumTargetAreas();
+			targetPointDistance = TOPProblemInfo.getTruckMaxTravelTime()
+					* TOPProblemInfo.getTargetPointDistanceFactor();
+			targetEllipseSize = TOPProblemInfo.getTruckMaxTravelTime() * TOPProblemInfo.getTargetEllipseSizeFactor();
+			targetX = mainDepots.getStartingDepot().getXCoord()
+					+ (Math.cos(TOPProblemInfo.getInitialAngle()) * targetPointDistance);
+			targetY = mainDepots.getStartingDepot().getYCoord()
+					+ (Math.sin(TOPProblemInfo.getInitialAngle()) * targetPointDistance);
+
+			// Determine which shipments can and cannot be added to truck routes due to
+			// distance
+			mainDepots.markUnreachableShipments(mainShipments);
+
+			// Generate solutions for each target area, keeping track of the overall best
+			// solution
+			bestMainShipments = new TOPShipmentLinkedList();
+			resetMainShipments = (TOPShipmentLinkedList) mainShipments.clone();
+			bestMainDepots = new TOPDepotLinkedList();
+			resetMainDepots = (TOPDepotLinkedList) mainDepots.clone();
+			bestScore = 0.0f;
+			for (int i = 0; i < TOPProblemInfo.getNumTargetAreas(); i++) {
+				// Set up the shipment selection type
+				secondarySelectType = new HighestDemandInReachableArea();
+				primarySelectType = new EllipticalTargetArea(targetX, targetY, targetEllipseSize, secondarySelectType);
+				TOPProblemInfo.setSelectShipType(primarySelectType);
+				Settings.printDebug(Settings.COMMENT, EllipticalTargetArea.WhoAmI());
+
+				// Captures the initial information on solving the problem, and
+				// returns the total customer and total distance after the initial solution
+				opInfo = createInitialRoutes();
+				optInformation.add("Inital Solution " + opInfo);
+
+				// Get the initial solution
+				// Depending on the Settings status, display information on the routes
+				// Trucks used, total demand, dist, travel time and cost
+				Settings.printDebug(Settings.COMMENT, "Created Initial Routes ");
+				Settings.printDebug(Settings.COMMENT, "Initial Stats: " + mainDepots.getSolutionString());
+
+				// Optimize the solution
+				runOptimizations();
+
+				// Ensure that the solution is feasible
+				maintainFeasibility();
+
+				// If this is the best solution so far, save it
+				if ((TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(mainDepots) > bestScore)
+						|| (bestScore == 0.0)) {
+					bestScore = TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(mainDepots);
+					bestMainDepots = (TOPDepotLinkedList) mainDepots.clone();
+					bestMainShipments = (TOPShipmentLinkedList) mainShipments.clone();
+				}
+
+				// Move the target area for the next pass
+				tempX = (float) ((targetX * Math.cos(angleBetweenPasses)) - (targetY * Math.sin(angleBetweenPasses)))
+						- TOPProblemInfo.getStartXCoord();
+				targetY = (float) ((targetX * Math.sin(angleBetweenPasses)) + (targetY * Math.cos(angleBetweenPasses)))
+						- TOPProblemInfo.getStartYCoord();
+				targetX = tempX;
+
+				// Reset mainDepots and mainShipments for the next pass
+				mainDepots = (TOPDepotLinkedList) resetMainDepots.clone();
+				mainShipments = (TOPShipmentLinkedList) resetMainShipments.clone();
+			}
+
+			// Use the best solution as the final answer
+			mainDepots = (TOPDepotLinkedList) bestMainDepots.clone();
+			mainShipments = (TOPShipmentLinkedList) bestMainShipments.clone();
+		}
+
+		// Capture the CPU time required for solving the problem
+		endTime = System.currentTimeMillis();
+
+		// Only perform these steps if the GA is disabled. If it is enabled, these steps
+		// will
+		// be performed at the very end by the GA class
+		if (TOPProblemInfo.getEnableGA() == false) {
+			// Run quality assurance on the solution
+			runQA();
+
+			// Write the solution files
+			// writeLongSolution(dataFile.substring(dataFile.lastIndexOf("/") + 1));
+			// writeShortSolution(dataFile.substring(dataFile.lastIndexOf("/") + 1));
+
+			// Write solution files with Excel
+			writeLongSolutionExcel(outFile);
+			writeShortSolutionExcel(outFile);
+			writeComparisonExcel(dataSet, truckCount, constraint, filePath);
+
+			// Display the score
+			Settings.printDebug(Settings.COMMENT, "Total Score: " + getTotalScore());
+
+			if (TOPProblemInfo.getEnableGUI() == true) {
+				displayGUI();
+			}
+		}
+	}
+
+	/**
+	 * Runs the quality assurance package to ensure that the solution is within the
+	 * constraints of the problem
+	 * 
+	 * @return boolean
+	 */
+	public boolean runQA() {
+		TOPQA = new TOPQualityAssurance(mainDepots, mainShipments);
+
+		return TOPQA.runQA();
+	}
+
+	// public void displayGU
+
+	/**
+	 * Creates the initial solution for the problem Modified by Peter Schallot and
+	 * David Crissman
+	 */
+	public OptInfo createInitialRoutes() {
+		OptInfo info = new OptInfo(); // OptInfo has old and new attributes
+		TOPDepot startDepot, endDepot; // Depot to which shipments are currently being added
+		TOPShipment currentShipment; // Shipment currently being inserted
+
+		// Check if selection and insertion type methods have been selected
+		if (TOPProblemInfo.getSelectShipType() == null) {
+			Settings.printDebug(Settings.ERROR, "No selection shipment type has been assigned");
+		}
+		if (TOPProblemInfo.getInsertShipType() == null) {
+			Settings.printDebug(Settings.ERROR, "No insertion shipment type has been assigned");
+		}
+
+		// Capture the old attributes
+		info.setOldAttributes(mainDepots.getAttributes());
+
+		// Assign as many shipments as possible to trucks using the primary selection
+		// algorithm
+		TOPProblemInfo.setSelectShipType(primarySelectType);
+		while (mainShipments.isAllShipsAssignedOrUnreachable() == false) {
+			currentShipment = mainShipments.getNextInsertShipment(mainDepots, mainDepots.getStartingDepot(),
+					mainShipments, null);
+
+			// If the shipment is null, no more shipments can be obtained using the primary
+			// algorithm
+			if (currentShipment == null) {
+				break;
+			} else {
+				// The selected shipment will be inserted into the route
+				if (!mainDepots.insertShipment(currentShipment)) {
+					Settings.printDebug(Settings.COMMENT,
+							"The Shipment: <" + currentShipment.getIndex() + "> cannot be routed");
+					currentShipment.setChecked(true);
+				} else {
+					Settings.printDebug(Settings.COMMENT,
+							"The Shipment: <" + currentShipment.getIndex() + "> was routed");
+					currentShipment.setAssigned(true);
+				}
+			}
+		}
+
+		// Clear the "checked" flags on all shipments
+		currentShipment = mainShipments.getTOPHead();
+		while (currentShipment != null) {
+			currentShipment.setChecked(false);
+			currentShipment = currentShipment.getTOPNext();
+		}
+
+		// Assign the remaining shipments to trucks using the secondary selection
+		// algorithm
+		TOPProblemInfo.setSelectShipType(secondarySelectType);
+		while (mainShipments.isAllShipsAssignedOrUnreachable() == false) {
+			currentShipment = mainShipments.getNextInsertShipment(mainDepots, mainDepots.getStartingDepot(),
+					mainShipments, null);
+
+			// If the shipment is null, print error message
+			if (currentShipment.getIndex() == -1) {
+				Settings.printDebug(Settings.COMMENT, "No shipment was selected");
+				break;
+			} else {
+				// The selected shipment will be inserted into the route
+				if (!mainDepots.insertShipment(currentShipment)) {
+					Settings.printDebug(Settings.COMMENT,
+							"The Shipment: <" + currentShipment.getIndex() + "> cannot be routed");
+				} else {
+					Settings.printDebug(Settings.COMMENT,
+							"The Shipment: <" + currentShipment.getIndex() + "> was routed");
+					currentShipment.setAssigned(true);
+				}
+			}
+
+		}
+
+		// Calculate information about the solution that was generated
+		TOPProblemInfo.getDepotLLLevelCostF().calculateTotalsStats(mainDepots);
+		info.setNewAtributes(mainDepots.getAttributes());
+
+		return info;
+	}
+
+	/**
+	 * Write out the data file that was read in
+	 * 
+	 * @param file
+	 */
+
+	public void writeDataFile(String file) {
+		try {
+			PrintStream ps = new PrintStream(new FileOutputStream(file + "_students.txt"));
+			mainShipments.writeTOPShipments(ps);
+		} catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+
+	public void writeDataToFileExcel(String file) {
+
+		mainShipments.writeTOPShipmentsExcel(ZeusProblemInfo.getOutputPath() + file + "_students.xlsx");
+
+	}
+
+	/**
+	 * Writes out comparison file using POI implementation
+	 * 
+	 * @param dataSet
+	 * @param truckCount
+	 * @param constraint
+	 */
+	public void writeComparisonExcel(int dataSet, int truckCount, int constraint, String filePath) {
+		String selectShipType = ZeusProblemInfo.getSelectShipType().toString();
+		selectShipType = selectShipType.substring(selectShipType.lastIndexOf('.') + 1, selectShipType.lastIndexOf('@'));
+		System.out.println("Problem Type " + selectShipType);
+
+		String file = ZeusProblemInfo.getOutputPath() + "TOP_comparison_" + selectShipType + ".xlsx";
+		try {
+
+			FileInputStream dataInputStream = new FileInputStream(file);
+			XSSFWorkbook dataWorkbook = new XSSFWorkbook(dataInputStream);
+			XSSFSheet dataWorksheet = dataWorkbook.getSheetAt(0);
+
+			Cell cell = dataWorksheet.getRow(((dataSet - 1) * 3) + truckCount - 1)
+					.getCell(Character.getNumericValue(constraint) - 9);
+			cell.setCellValue(mainDepots.getTOPHead().getNext().getAttributes().getTotalDemand());
+
+			FileOutputStream fileOut = new FileOutputStream(file);
+			dataWorkbook.write(fileOut);
+
+			// workbook.write(fileOut);
+			System.out.println("Long Excel File Outputed");
+		} catch (FileNotFoundException e) {
+			// Write file starter
+			try {
+				XSSFWorkbook workbook = new XSSFWorkbook();
+				XSSFSheet worksheet1 = workbook.createSheet("Timings");
+				XSSFSheet worksheet2 = workbook.createSheet("Best_Known");
+				XSSFSheet worksheet3 = workbook.createSheet("Comparison");
+
+				int k = 0;
+				for (int i = 0; i < 22; i++) {
+					Row row = worksheet1.createRow(i);
+					if (i == 0) {
+						for (int j = 0; j < 26; j++) {
+							row.createCell(j).setCellValue(String.valueOf((char) (j + 96)));
+						}
+					} else {
+						if ((i - 1) % 3 == 0) {
+							k++;
+						}
+						for (int j = 0; j < 26; j++) {
+							if (j == 0) {
+								row.createCell(j).setCellValue("Data Set " + k + "." + (((i - 1) % 3) + 2));
+							} else {
+								row.createCell(j).setCellValue("Not Run");
+							}
+						}
+
+					}
+				}
+
+				k = 0;
+				for (int i = 0; i < 22; i++) {
+					Row row = worksheet2.createRow(i);
+					if (i == 0) {
+						for (int j = 0; j < 26; j++) {
+							row.createCell(j).setCellValue(String.valueOf((char) (j + 96)));
+						}
+					} else {
+						if ((i - 1) % 3 == 0) {
+							k++;
+						}
+						for (int j = 0; j < 26; j++) {
+							if (j == 0) {
+								row.createCell(j).setCellValue("Data Set " + k + "." + (((i - 1) % 3) + 2));
+							} else {
+								try {
+
+									String knownBestFile = filePath + "knownBest.xlsx";
+
+									FileInputStream knownBestFileStream = new FileInputStream(knownBestFile);
+									XSSFWorkbook knownBestFileWorkbook = new XSSFWorkbook(knownBestFileStream);
+									XSSFSheet knownBestFileWorksheet = knownBestFileWorkbook.getSheetAt(0);
+
+									row.createCell(j)
+											.setCellValue(knownBestFileWorksheet.getRow(i).getCell(j).toString());
+
+								} catch (Exception exception) {
+									exception.printStackTrace();
+								}
+							}
+						}
+
+					}
+				}
+
+				k = 0;
+				for (int i = 0; i < 22; i++) {
+					Row row = worksheet3.createRow(i);
+					if (i == 0) {
+						for (int j = 0; j < 26; j++) {
+							if (j == 0) {
+								row.createCell(j).setCellValue("All Values in %");
+							} else {
+								row.createCell(j).setCellValue(String.valueOf((char) (j + 96)));
+							}
+						}
+					} else {
+						if ((i - 1) % 3 == 0) {
+							k++;
+						}
+						for (int j = 0; j < 26; j++) {
+							if (j == 0) {
+								row.createCell(j).setCellValue("Data Set " + k + "." + (((i - 1) % 3) + 2));
+							} else {
+								String cellLocation = String.valueOf((char) (j + 97)) + (i + 1);
+								row.createCell(j).setCellType(Cell.CELL_TYPE_FORMULA);
+								row.createCell(j).setCellFormula(
+										"(Timings!" + cellLocation + "/Best_Known!" + cellLocation + ")*100");
+								// =(Timings!B2/Best_Known!B2)*100
+							}
+						}
+
+					}
+				}
+
+				FileOutputStream fileOut = new FileOutputStream(file);
+				workbook.write(fileOut);
+
+				writeComparisonExcel(dataSet, truckCount, constraint, filePath);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Will write a long detailed solution for the problem
+	 * 
+	 * @param file - Name of the file to write to
+	 */
+	public void writeLongSolution(String file) {
+		try {
+			PrintStream ps = new PrintStream(new FileOutputStream(TOPProblemInfo.getOutputPath() + file + "_long.txt"));
+			mainDepots.printDepotLinkedList(ps);
+		} catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+
+	/**
+	 * Writes out long solution excel file using POI
+	 * 
+	 * @param file
+	 */
+	public void writeLongSolutionExcel(String file) {
+
+		String selectShipType = ZeusProblemInfo.getSelectShipType().toString();
+		selectShipType = selectShipType.substring(selectShipType.lastIndexOf('.') + 1, selectShipType.lastIndexOf('@'));
+		System.out.println("Problem Type " + selectShipType);
+
+		String insertShipType = ZeusProblemInfo.getInsertShipType().toString();
+		insertShipType = insertShipType.substring(insertShipType.lastIndexOf('.') + 1, insertShipType.lastIndexOf('@'));
+		System.out.println("Problem Type " + insertShipType);
+
+		try {
+			// create our POI objects
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			XSSFSheet worksheet = workbook.createSheet("Sheet1");
+
+			int i = 0;
+			Row row = worksheet.createRow(i);
+			row.createCell(0).setCellValue(ZeusProblemInfo.getNumDepots());
+
+			// export data to excel file
+			Depot depot = mainDepots.getHead().getNext();
+			while (depot != mainDepots.getTail()) {
+				i++;
+				row = worksheet.createRow(i);
+
+				// export depot data
+				row.createCell(0).setCellValue("Depot #" + depot.getDepotNum());
+				row.createCell(1).setCellValue("Depot X: " + depot.getXCoord());
+				row.createCell(2).setCellValue("Depot Y: " + depot.getYCoord());
+				row.createCell(3).setCellValue("Depot Total Demand: " + depot.getAttributes().getTotalDemand());
+				row.createCell(4).setCellValue("Depot Total Distance: " + depot.getAttributes().getTotalDistance());
+				row.createCell(5).setCellValue("Depot Total Trucks: " + depot.getMainTrucks().getSize());
+
+				Truck truck = depot.getMainTrucks().getHead().getNext();
+				Truck truckTail = depot.getMainTrucks().getTail();
+
+				while (truck != truckTail) {
+					i++;
+					row = worksheet.createRow(i);
+
+					// export truck data
+					row.createCell(0).setCellValue("Truck #" + truck.getTruckNum());
+					row.createCell(1).setCellValue("Truck Max Distance: " + truck.getTruckType().getMaxDuration());
+					row.createCell(2).setCellValue("Truck Node Count: " + (truck.getMainNodes().getSize()));
+					row.createCell(3).setCellValue("Truck Total Demand: " + truck.getAttributes().getTotalDemand());
+					row.createCell(4).setCellValue("Truck Total Distance: " + truck.getAttributes().getTotalDistance());
+
+					Nodes cell = truck.getMainNodes().getHead().getNext();
+					Nodes cellTail = truck.getMainNodes().getTail();
+
+					i++;
+					row = worksheet.createRow(i);
+
+					// export shipment data
+					row.createCell(0).setCellValue("Shipment #");
+					row.createCell(1).setCellValue("Shipment Demand: ");
+					row.createCell(2).setCellValue("Shipment X: ");
+					row.createCell(3).setCellValue("Shipment Y: ");
+
+					while (cell != cellTail) {
+						i++;
+						row = worksheet.createRow(i);
+
+						// export shipment data
+						row.createCell(0).setCellValue(cell.getIndex());
+						row.createCell(1).setCellValue(cell.getDemand());
+						row.createCell(2).setCellValue(cell.getShipment().getXCoord());
+						row.createCell(3).setCellValue(cell.getShipment().getYCoord());
+						cell = cell.getNext();
+					}
+
+					truck = truck.getNext();
+				}
+
+				depot = depot.getNext();
+			}
+
+			file = ZeusProblemInfo.getOutputPath() + file + "_long_" + selectShipType + ".xlsx";
+
+			FileOutputStream fileOut = new FileOutputStream(file);
+			workbook.write(fileOut);
+			System.out.println("Long Excel File Outputed");
+		} catch (Exception e) {
+			System.out.println("Error in printDepotLinkedList" + e);
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Write out both the long and short solution files.
+	 */
+	public void writeAllSolutionFiles() {
+		writeDataFile(this.dataFile);
+		writeLongSolution(this.dataFile);
+		writeShortSolution(this.dataFile);
+	}
+
+	/**
+	 * Will write a short solution for the problem
+	 * 
+	 * @param file - Name of the file to write to
+	 */
+	public void writeShortSolution(String file) {
+		double totalScore = TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(mainDepots); // getTeamScore();
+		try {
+			PrintStream ps = new PrintStream(
+					new FileOutputStream(TOPProblemInfo.getOutputPath() + file + "_short.txt"));
+			TOPDepot d = (TOPDepot) mainDepots.getHead();
+
+			ps.println("File: " + file + " Num Depots: " + TOPProblemInfo.getNumDepots() + " Num Pick Up Points: "
+					+ TOPProblemInfo.getNumCustomers() + " Num Trucks: " + TOPProblemInfo.getNumTrucks()
+					+ " Truck Max Travel Time: " + TOPProblemInfo.getTruckMaxTravelTime() + " Processing Time: "
+					+ (endTime - startTime) / 1000 + " seconds");
+			ps.println(mainDepots.getAttributes().toDetailedString());
+			ps.println("Total Score: " + totalScore);
+
+			ps.println();
+
+			while (d != null) {
+				TOPTruck t = (TOPTruck) d.getMainTrucks().getHead();
+
+				while (t != null) {
+					ps.print("Truck #" + t.getTruckNum() + " MaxCap: " + t.getTruckType().getMaxCapacity() + " Demand: "
+							+ t.getAttributes().getTotalDemand() + " ROUTE:");
+					Nodes p = t.getMainNodes().getHead();
+
+					while (p != null) {
+						ps.print(p.getIndex() + " ");
+						p = p.getNext();
+					}
+
+					if (t.getIsTeamMember()) {
+						ps.print(" (TEAM MEMBER)");
+					} else {
+						ps.print(" (NOT ON TEAM)");
+					}
+					ps.println();
+					t = (TOPTruck) t.getNext();
+				}
+
+				ps.println();
+				ps.println();
+				d = (TOPDepot) d.getNext();
+			}
+			for (int i = 0; i < optInformation.size(); i++) {
+				ps.println(optInformation.elementAt(i));
+			}
+		} catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+
+	/**
+	 * Writes out short solution to excel file using POI
+	 * 
+	 * @param file
+	 */
+	public void writeShortSolutionExcel(String file) {
+		// PrintStream ps = new PrintStream(new FileOutputStream(ProblemInfo.
+		// outputPath + "/" + file + "_short.txt"));
+
+		try {
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			XSSFSheet worksheet = workbook.createSheet("Sheet1");
+
+			String selectShipType = ZeusProblemInfo.getSelectShipType().toString();
+			selectShipType = selectShipType.substring(selectShipType.lastIndexOf('.') + 1,
+					selectShipType.lastIndexOf('@'));
+			System.out.println("Problem Type " + selectShipType);
+
+			String insertShipType = ZeusProblemInfo.getInsertShipType().toString();
+			insertShipType = insertShipType.substring(insertShipType.lastIndexOf('.') + 1,
+					insertShipType.lastIndexOf('@'));
+			System.out.println("Problem Type " + insertShipType);
+
+			int i = 0;
+			Row row = worksheet.createRow(i);
+
+			row.createCell(0).setCellValue("File: ");
+			row.createCell(1).setCellValue(file);
+			i++;
+			row = worksheet.createRow(i);
+
+			row.createCell(0).setCellValue("Selection Type: ");
+			row.createCell(1).setCellValue(selectShipType);
+			i++;
+			row = worksheet.createRow(i);
+
+			row.createCell(0).setCellValue("Insertion Type: ");
+			row.createCell(1).setCellValue(insertShipType);
+			i++;
+			row = worksheet.createRow(i);
+			i++;
+			row = worksheet.createRow(i);
+
+			row.createCell(0).setCellValue("Truck");
+			row.createCell(1).setCellValue("Distance");
+			row.createCell(2).setCellValue("Demand");
+			row.createCell(3).setCellValue("Used");
+			row.createCell(4).setCellValue("Route");
+
+			TOPDepot depotHead = mainDepots.getTOPHead();
+			Depot depotTail = mainDepots.getTail();
+			while (depotHead != depotTail) {
+				i++;
+				row = worksheet.createRow(i);
+				// TOPTruck truckHead = depotHead.getMainTrucks().getHead().getTOPNext();
+				TOPTruck truckHead = (TOPTruck) depotHead.getMainTrucks().getHead().getNext();
+				// TOPTruck truckTail = depotHead.getMainTrucks().getTail();
+				TOPTruck truckTail = (TOPTruck) depotHead.getMainTrucks().getTail();
+
+				while (truckHead != truckTail) {
+					row = worksheet.createRow(i);
+
+					row.createCell(0).setCellValue(truckHead.getTruckNum());
+					row.createCell(1).setCellValue(truckHead.getAttributes().getTotalDistance());
+					row.createCell(2).setCellValue(truckHead.getAttributes().getTotalDemand());
+					// row.createCell(3).setCellValue(truckHead.getIsUsed());
+					row.createCell(3).setCellValue(truckHead.getIsUsed());
+
+					Nodes nodesHead = truckHead.getMainNodes().getHead();
+					Nodes nodesTail = truckHead.getMainNodes().getTail().getNext();
+
+					int j = 0;
+					while (nodesHead != nodesTail) {
+						row.createCell(j + 4).setCellValue(nodesHead.getIndex());
+						nodesHead = nodesHead.getNext();
+						j++;
+					}
+
+					i++;
+					truckHead = truckHead.getTOPNext();
+				}
+
+				// depotHead = depotHead.getNext();
+				depotHead = (TOPDepot) depotHead.getNext();
+			}
+			i++;
+			row = worksheet.createRow(i);
+			for (int s = 0; s < optInformation.size(); s++) {
+				row.createCell(s).setCellValue(optInformation.elementAt(s).toString());
+			}
+
+			file = ZeusProblemInfo.getOutputPath() + file + "_short_" + selectShipType + ".xlsx";
+			FileOutputStream fileOut = new FileOutputStream(file);
+			workbook.write(fileOut);
+			System.out.println("Short Excel File Outputed");
+		} catch (IOException ioex) {
+			ioex.printStackTrace();
+		}
+	}
+
+	/**
+	 * Runs optmizations inserted into the mainOpts vector
+	 */
+	/**
+	 * Reads in shipments data from an excel file
+	 * 
+	 * @param dataFile
+	 * @param constraintFile
+	 * @param constraint
+	 * @param truckCount
+	 * @param routeToOriginal
+	 */
+
+	/**
+	 * Reads in shipments data from an excel file
+	 * 
+	 * @param dataFile
+	 * @param constraintFile
+	 * @param constraint
+	 * @param truckCount
+	 * @param routeToOriginal
+	 */
+	/*
+	 * Method used to read data from the specified Excel file
+	 */
+	public int readDataFromExcelFile(String TOPFileName) {
+		// read in the MDTOP data from the listed file and load the information
+		// into the availShipments linked list
+		int m = 0, // number of vehicles
+				n = 0, // number of customers
+				t = 0, // number of days(or depots)
+				Q = 0; // maximum capacity of vehicle
+		float D = 0; // maximum duration of route
+		int type = 0; // (MDTOP)
+		// = 1 (PTSP)
+		// = 2 (PTOP)
+		char ch;
+		String temp = "";
+		int index = 0, j = 0, numOfProblems = 0, // number of customers
+				numOfTours = 0; // number of tours (or vehicles)
+		float maxDistance = 0; // maximum distance
+
+		t = 1; // number of days(or depots)
+		// D = 0, //maximum duration of route
+		Q = 0; // maximum load of vehicle
+		int p = 3; // Np neighborhood size
+		int depotIndex;
+
+		// Open the requested file
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		FileInputStream fis;
+		XSSFSheet sheet;
+		XSSFRow curRow;
+		int rowCounter = 1; // initial the row counter
+
+		try {
+			fis = new FileInputStream(new File(TOPFileName));
+			workbook = new XSSFWorkbook(fis);
+			sheet = workbook.getSheetAt(0);
+			curRow = sheet.getRow(rowCounter); // the 2nd row is the problem data
+
+		} catch (Exception e) {
+			System.out.println("readDataFromExcelFile - " + TOPFileName + " File is not present");
+			System.out.println("Exception: " + e);
+			return 0;
+		}
+
+		// read in the first line
+		try {
+			numOfProblems = Integer.parseInt(curRow.getCell(0).getStringCellValue()) - 2;
+			numOfTours = Integer.parseInt(curRow.getCell(1).getStringCellValue());
+			maxDistance = Float.parseFloat(curRow.getCell(2).getStringCellValue());
+		} catch (Exception e) {
+			System.out.println("Line could not be read in");
+		}
+
+		// Put the problem information into the ProblemInfo class
+		// set the problem info for the problem
+		ZeusProblemInfo.setNumDepots(2); // Set the number of depots to 1 for this problem
+		ZeusProblemInfo.setProbFileName(TOPFileName); // name of the problem file being read in
+		ZeusProblemInfo.setNoOfShips(numOfProblems); // number of shipments
+		ZeusProblemInfo.setNoOfVehs(numOfTours); // number of vehicles
+		D = maxDistance; // Set maximum distance
+		TOPProblemInfo.setTruckMaxTravelTime(maxDistance);
+		// TOP Problem read-in verification
+		System.out.println("TOP Problem verification for " + TOPFileName);
+		System.out.println("numOfProblems: " + numOfProblems);
+		System.out.println("numOfTours: " + numOfTours);
+		System.out.println("maxDistance: " + maxDistance);
+
+		if (Q == 0) { // if there is no maximum capacity, set it to a very large number
+			Q = 999999999;
+		}
+		if (D == 0) { // if there is no travel time, set it to a very large number
+			D = 999999999; // if there is not maximum distance, set it to a very large number
+			// ProblemInfo.maxCapacity = Q; //maximum capacity of a vehicle
+			// ProblemInfo.maxDistance = D; //maximum distance of a vehicle
+		}
+		/**
+		 * @todo There three variables need to be defined at the beginning of the method
+		 */
+		float maxCapacity = Q; // maximum capacity of a vehicle
+
+		String serviceType = "1"; // serviceType is the trucktype. Should match with
+		// required truck type
+		// In some problems, different truck types might be present to solve
+		// the problem. For this problem, we assume that there is only one
+		// truck type that is available.
+		// loop through each truck type and store each one in the vector
+		int numTruckTypes = 1;
+		for (int i = 0; i < numTruckTypes; i++) {
+			TOPTruckType truckType = new TOPTruckType(i, maxDistance, maxCapacity, serviceType);
+			ZeusProblemInfo.addTruckTypes(truckType);
+		}
+
+		// Some problems tend to have different customer types. In this problem
+		// there is only one customter type. The integer value for the customer type
+		// should match with the integer value for the truck type for the compatibiliy
+		// check to work
+		// read in the different customer types
+		Vector<Integer> custTypes = new Vector<Integer>();
+		// Obtain the different customer types
+		for (int ct = 0; ct < 1; ct++) {
+			custTypes.add(new Integer(1));
+		}
+
+		if (type != 0) { // then it is not an MDTOP problem
+			System.out.println("Problem is not an MDTOP problem");
+			return 0;
+		}
+
+		// This section will get the depot x and y for the PTOP and the PTSP.
+		int runTimes = numOfProblems + 2;
+		float x = 0, // x coordinate
+				y = 0; // y coordinate
+		int i = 0, // customer number
+				score = 0; // score value
+
+		try {
+			// The first for loop runtimes dependent upon how many lines are to be read in
+			// The next for loop reads the line into s. Then the entire string in s
+			// is processed until the the entire line is processed and there are no
+			// more characters are to be processed. There is a case for each index
+			// except for the combinations. The combinations are processed
+			// until the last character in s is processed
+
+			rowCounter = 3; // set the rowCounter, customer data begin from the 3rd row
+
+			for (int k = 0; k < runTimes; k++) {
+
+				index = 0;
+				temp = "";
+				curRow = sheet.getRow(rowCounter);
+				if (k == 0) {
+					try { // read the current row
+							// i = Integer.parseInt(curRow.getCell(0).getStringCellValue());
+						x = Float.parseFloat(curRow.getCell(1).getStringCellValue());
+						y = Float.parseFloat(curRow.getCell(2).getStringCellValue());
+						score = Integer.parseInt(curRow.getCell(3).getStringCellValue());
+
+						// TOP Problem read-in verification
+						System.out.println("Index of TOP Problem: " + i);
+						System.out.println("x coordinate: " + x);
+						System.out.println("y coordinate: " + y);
+						System.out.println("Score: " + score);
+					} catch (Exception e) {
+						System.out.println("Line could not be read in line 474");
+						System.out.println("Exception: " + e);
+					}
+					TOPDepot newDepot = new TOPDepot(0, x, y);
+					mainDepots.insertDepotLast(newDepot);
+					mainDepots.setStartingDepot(newDepot);
+				} else if (k == runTimes - 1) {
+					try { // read the current row
+							// i = Integer.parseInt(curRow.getCell(0).getStringCellValue());
+						x = Float.parseFloat(curRow.getCell(1).getStringCellValue());
+						y = Float.parseFloat(curRow.getCell(2).getStringCellValue());
+						score = Integer.parseInt(curRow.getCell(3).getStringCellValue());
+
+						// TOP Problem read-in verification
+						System.out.println("Index of TOP Problem: " + i);
+						System.out.println("x coordinate: " + x);
+						System.out.println("y coordinate: " + y);
+						System.out.println("Score: " + score);
+
+					} catch (Exception e) {
+						System.out.println("Line could not be read in line 474");
+						System.out.println("Exception: " + e);
+					}
+					TOPDepot newDepot = new TOPDepot(1, x, y);
+					mainDepots.insertDepotLast(newDepot);
+					mainDepots.setEndingDepot(newDepot);
+				} else {
+					try { // read the current row
+						i = Integer.parseInt(curRow.getCell(0).getStringCellValue());
+						x = Float.parseFloat(curRow.getCell(1).getStringCellValue());
+						y = Float.parseFloat(curRow.getCell(2).getStringCellValue());
+						score = Integer.parseInt(curRow.getCell(3).getStringCellValue());
+
+						// TOP Problem read-in verification
+						System.out.println("Index of TOP Problem: " + i);
+						System.out.println("x coordinate: " + x);
+						System.out.println("y coordinate: " + y);
+						System.out.println("Score: " + score);
+
+					} catch (Exception e) {
+						System.out.println("Line could not be read in line 474");
+						System.out.println("Exception: " + e);
+					}
+					int list[] = new int[ZeusProblemInfo.getMaxCombinations()];
+					int currentComb[][] = new int[ZeusProblemInfo.getMaxHorizon()][ZeusProblemInfo
+							.getMaxCombinations()];
+					Integer custType = (Integer) custTypes.elementAt(0);
+					mainShipments.insertShipment(i, x, y, score, custType.toString());
+				}
+
+				rowCounter++; // go to next row
+			} // end for
+
+			/*
+			 * for(i = 0; i < ZeusProblemInfo.getNoOfVehs(); i++) { TOPTruckType ttype =
+			 * (TOPTruckType) ZeusProblemInfo.getTruckTypesAt(0);
+			 * mainDepots.getHead().getNext().getMainTrucks().insertTruckLast(new
+			 * TOPTruck(ttype, mainDepots.getStartingDepot().getXCoord(),
+			 * mainDepots.getStartingDepot().getYCoord(),
+			 * mainDepots.getEndingDepot().getDepotNum(),
+			 * mainDepots.getEndingDepot().getXCoord(),
+			 * mainDepots.getEndingDepot().getYCoord()));
+			 * mainDepots.getHead().getNext().getMainTrucks().getTail().getPrev().
+			 * setTruckNum(i); }
+			 */
+			for (i = 0; i < ZeusProblemInfo.getNoOfVehs(); i++) {
+				TOPTruckType ttype = (TOPTruckType) ZeusProblemInfo.getTruckTypesAt(0);
+				mainDepots.getHead().getNext().getMainTrucks()
+						.insertTruckLast(new TOPTruck(ttype, mainDepots.getStartingDepot().getXCoord(),
+								mainDepots.getStartingDepot().getYCoord(), mainDepots.getEndingDepot().getDepotNum(),
+								mainDepots.getEndingDepot().getXCoord(), mainDepots.getEndingDepot().getYCoord()));
+				mainDepots.getHead().getNext().getMainTrucks().getTail().getPrev().setTruckNum(i);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Reading the line");
+		}
+
+		// print out the shipment numbers on command line
+		// mainShipments.printShipNos();
+		// call method to send the data to file
+		try {
+
+		} catch (Exception e) {
+			System.out.println("Shipment information could not be sent to the file");
+		}
+		// for debugging file read in and shipment insertion only
+		/*
+		 * System.out.println("trucks");
+		 * System.out.println("should be this many trucks: " +
+		 * ZeusProblemInfo.getNoOfVehs());
+		 * System.out.println(mainDepots.getTOPHead().getNext().getMainTrucks().getSize(
+		 * )); //mainShipments.printTOPShipmentsToConsole(); Scanner reader = new
+		 * Scanner(System.in); String notUseful = reader.nextLine(); reader.close();
+		 */
+		return 1;
+	}
+
+	/**
+	 * Print out the data to the console
+	 */
+
+	public void printDataToConsole() {
+		try {
+			// data.mainShipments.printTOPShipmentsToConsole();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void runOptimizations() {
+		/*
+		 * TOPOptEntry opt;
+		 * 
+		 * for (int i = 0; i < mainOpts.size(); i++) { opt = mainOpts.get(i);
+		 * Settings.printDebug(Settings.COMMENT, "Running " + opt);
+		 * 
+		 * optInformation.add(opt.toString() + " " + opt.run(mainDepots));
+		 * 
+		 * Settings.printDebug(Settings.COMMENT, opt.toString() + " Stats: " +
+		 * mainDepots.getSolutionString()); }
+		 */
+	}
+
+	/**
+	 * Runs a series of tests to ensure that the solution is feasible
+	 */
+	public void maintainFeasibility() {
+
+		TOPTruck currentTruck = mainDepots.getStartingDepot().getTOPMainTrucks().getTOPHead();
+
+		TOPNodesLinkedList nList = null;
+		TOPNodes n1 = null;
+		TOPNodes n2 = null;
+		TOPNodes n3 = null;
+
+		// If the depots are further apart than the maximum travel distance, the
+		// single truck will have a scoreless, yet unfeasible route. In this case,
+		// we merely loop through the trucks.
+		while (currentTruck != null) {
+			nList = currentTruck.getTOPMainNodes();
+			if (nList != null) {
+				n1 = nList.getTOPHead();
+				n2 = nList.getTOPTail();
+				n3 = n1.getTOPNext();
+
+				if (n2 == null || n3 == null) {
+					currentTruck = currentTruck.getTOPNext();
+				} else if (n2 == n3) {
+					currentTruck = currentTruck.getTOPNext();
+				} else {
+					break;
+				}
+			}
+		}
+
+		while (currentTruck != null) {
+			if (!currentTruck.isEmptyMainNodes())
+				while (currentTruck.getTOPMainNodes().getTOPFeasibility().isPostOptFeasible() == false) {
+					currentTruck.getTOPMainNodes().removeLowestScoringShipment();
+					if (currentTruck.getTOPMainNodes() == null) {
+						break;
+					}
+					if (currentTruck.getTOPMainNodes().getTOPFeasibility() == null) {
+						break;
+					}
+				}
+
+			currentTruck = currentTruck.getTOPNext();
+		}
+	}
+
+	/**
+	 * Return the fitness for the GA.
+	 * 
+	 * @return double Added by Pete Schallot
+	 */
+	public double getTotalFitness() {
+		double demand = TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(this.mainDepots);
+		double distance = TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDistance(this.mainDepots);
+
+		if (distance == 0 || demand == 0) {
+			return 0;
+		} else {
+			return demand + demand / (distance + demand);
+		}
+	}
+
+	/**
+	 * Return the total score.
+	 * 
+	 * @return double
+	 */
+	public double getTotalScore() {
+		return TOPProblemInfo.getTOPDepotLLCostFunctions().getTotalDemand(this.mainDepots);
+	}
+
+	/**
+	 * Opens a Zeus GUI window, displaying the current problem Added by David
+	 * Crissman
+	 */
+	public void displayGUI() {
+		TOPGui guiPost = new TOPGui(mainDepots, mainShipments);
+	}
+
+} // End of TOP file

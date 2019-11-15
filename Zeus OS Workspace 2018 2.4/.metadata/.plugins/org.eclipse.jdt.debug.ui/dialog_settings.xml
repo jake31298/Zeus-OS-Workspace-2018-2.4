@@ -3,10 +3,10 @@
 	<section name="conditionHistory">
 	</section>
 	<section name="org.eclipse.jdt.internal.debug.ui.ExpressionInformationControlCreator$ExpressionInformationControl">
-		<item value="500" key="SashWeightTree"/>
-		<item value="500" key="SashWeightDetails"/>
-		<item value="614" key="WIDTH"/>
-		<item value="194" key="HEIGHT"/>
+		<item key="SashWeightTree" value="500"/>
+		<item key="SashWeightDetails" value="500"/>
+		<item key="WIDTH" value="642"/>
+		<item key="HEIGHT" value="222"/>
 	</section>
 	<section name="expressionHistory">
 	</section>

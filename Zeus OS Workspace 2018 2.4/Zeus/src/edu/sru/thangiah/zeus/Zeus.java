@@ -24,18 +24,10 @@ public class Zeus {
   public static void main(String[] args) {
 	  
 	  
-    //Solve the VRP Problem
+    //Solve the TOP Problem
     //VRPRoot theRoot = new VRPRoot();
      TOPRoot theRoot = new TOPRoot();
-    //MDVRPRoot theRoot = new MDVRPRoot();
-	//HDMDVRPRoot theRoot = new HDMDVRPRoot();
-	  
 
-	//int minCapacity=0;
-	//int maxCapacity=0; 
-	//int maxMiles=0;
-	//int maxStops=0;
-	
 	System.gc();
 
   }
