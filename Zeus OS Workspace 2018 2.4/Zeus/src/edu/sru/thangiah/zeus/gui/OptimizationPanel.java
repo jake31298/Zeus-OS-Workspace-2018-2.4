@@ -9,7 +9,7 @@ import javax.swing.*;
 
 /**
  * This panel allows for the configuration of the opt looping tool.
- * <p>Title: Zeus - A Unified Object Oriented Model for VRP's</p>
+ * <p>Title: Zeus - A Unified Object Oriented Model for TOP's</p>
  * <p>Description: This panel allows for the configuration of the opt looping tool.
  * All changes made in this panel are saved in a class called OptLoopConfig.
  * The configuration can be obtained by calling the getConfiguration() method.</p>

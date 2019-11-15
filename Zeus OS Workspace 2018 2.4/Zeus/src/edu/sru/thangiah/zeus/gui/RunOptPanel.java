@@ -110,9 +110,7 @@ public class RunOptPanel
         //ProblemInfo.depotLLLevelCostF.getTotalConstraintCost(mainDepots)).
         //             toString());
     jLabel14.setText(new Double(
-           ZeusProblemInfo.getDepotLLLevelCostF().getTotalDistance(mainDepots)).toString());
-    //jLabel14.setText(new Double(
-    //    ProblemInfo1.depotLLLevelCostF.getTotalDistance(mainDepots)).toString());
+        ZeusProblemInfo.getDepotLLLevelCostF().getTotalDistance(mainDepots)).toString());
     jLabel15.setText(new Integer(mainDepots.getTotalNumTrucksUsed()).toString());
     jLabel111.setText("Cost:");
     jLabel110.setText("Distance:");

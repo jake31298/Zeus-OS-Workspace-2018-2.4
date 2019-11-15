@@ -62,11 +62,11 @@ public class ShipmentFrame
   private JTree makeTree(ShipmentLinkedList s) {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(
         "The Shipment Linked List");
-    Shipment shipment = s.getHead();
+    Shipment shipment = s.getHead().getNext();
     String shipInfo = "";
     int nextIndex = 0, prevIndex = 0;
 
-    while (shipment != null) {
+    while (shipment != s.getTail()) {
       if(shipment.getPrev() == null)
         prevIndex = -1;
       else if(shipment.getNext() == null)

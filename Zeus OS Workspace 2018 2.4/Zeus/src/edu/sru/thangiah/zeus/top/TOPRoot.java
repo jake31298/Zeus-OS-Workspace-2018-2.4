@@ -45,7 +45,7 @@ public class TOPRoot {
     TOPProblemInfo.setEnableGA(false);
     TOPProblemInfo.setEnableOptimizations(true);
     
-   String problem = "PROB4-2-b.PRN.xlsx";
+   String problem = "PROB3-2-l.PRN.xlsx";
     //For testing only, reads a single problem file
    //Run single problem
    

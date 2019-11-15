@@ -1,17 +1,11 @@
 package edu.sru.thangiah.zeus.gui;
 
 import edu.sru.thangiah.zeus.core.*;
-import edu.sru.thangiah.zeus.localopts.OptInfo;
-import edu.sru.thangiah.zeus.localopts.*;
-
 import java.awt.*;
 import java.util.*;
-
 import javax.swing.UIManager;
-
 import edu.sru.thangiah.zeus.gui.*;
 //import edu.sru.thangiah.zeus.core.
-import edu.sru.thangiah.zeus.localopts.*;
 /**
  * The main class for the graphical user interface
  * <p>Title: Mixed Fleet</p>
@@ -73,10 +67,10 @@ public class SBVRPGUI {
    * @param label what was just done
    * @param optInfo information about what was just done
    */
-  public void refresh(DepotLinkedList d, String label, OptInfo optInfo) {
-    //frame.refreshIt(d, label, optInfo);
-    frame.refreshIt(d, label);
-  }
+  //public void refresh(DepotLinkedList d, String label, OptInfo optInfo) {
+  //  //frame.refreshIt(d, label, optInfo);
+  //  frame.refreshIt(d, label);
+  //}
 
   /**
    * The main method

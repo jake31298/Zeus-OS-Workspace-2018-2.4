@@ -5,6 +5,7 @@ import java.util.*;
 import edu.sru.thangiah.zeus.top.topgui.*;
 import edu.sru.thangiah.zeus.top.topqualityassurance.*;
 import edu.sru.thangiah.zeus.core.*;
+import edu.sru.thangiah.zeus.gui.ZeusGui;
 import edu.sru.thangiah.zeus.localopts.*;
 import edu.sru.thangiah.zeus.localopts.interopts.FirstFirstInterSearch;
 import edu.sru.thangiah.zeus.localopts.intraopts.*;
@@ -105,15 +106,14 @@ public class TOP {
 		// Ensure that the shipment linked list has been loaded with the data
 		if (mainShipments.getTOPHead() == null) {
 			Settings.printDebug(Settings.ERROR, "TOP: Shipment linked list is empty");
-		} else if (mainDepots.getStartingDepot() == null) {
+		} 
+		else if (mainDepots.getStartingDepot() == null) {
 			Settings.printDebug(Settings.ERROR, "TOP: Starting depot has not been specified");
-		} else if (mainDepots.getEndingDepot() == null) {
+		} 
+		else if (mainDepots.getEndingDepot() == null) {
 			Settings.printDebug(Settings.ERROR, "TOP: Ending depot has not been specified");
-		} else {
-			// If optimizations are enabled, create a list of them to be run
-			if (TOPProblemInfo.isEnableOptimizations() == true) {
-			}
-
+		} 
+		else {
 			// Set up the shipment insertion type
 			TOPProblemInfo.setInsertShipType(new LinearGreedyInsertShipment());
 			Settings.printDebug(Settings.COMMENT, LinearGreedyInsertShipment.WhoAmI());
@@ -1121,7 +1121,7 @@ public class TOP {
 	 * Crissman
 	 */
 	public void displayGUI() {
-		TOPGui guiPost = new TOPGui(mainDepots, mainShipments);
+		ZeusGui guiPost = new ZeusGui(mainDepots, mainShipments);
 	}
 
 } // End of TOP file

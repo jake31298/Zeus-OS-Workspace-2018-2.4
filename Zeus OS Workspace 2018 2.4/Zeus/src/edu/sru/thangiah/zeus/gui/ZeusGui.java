@@ -1,6 +1,8 @@
 package edu.sru.thangiah.zeus.gui;
 
 import edu.sru.thangiah.zeus.core.*;
+import edu.sru.thangiah.zeus.top.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;

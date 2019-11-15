@@ -131,7 +131,6 @@ public class DepotFrame extends JInternalFrame {
                 if (!tempTruck.isEmptyMainNodes()) {
                     DefaultMutableTreeNode tempTNode = new DefaultMutableTreeNode(tempTruck.toString());
                     Nodes point = tempTruck.getMainNodes().getHead().getNext();
-
                     while (point != tempTruck.getMainNodes().getTail()) {
                       if(point.getPrev() == tempTruck.getMainNodes().getHead())
                         prevIndex = -1;

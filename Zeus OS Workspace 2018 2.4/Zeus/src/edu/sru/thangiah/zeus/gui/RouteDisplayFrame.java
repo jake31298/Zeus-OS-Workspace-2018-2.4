@@ -1,14 +1,22 @@
 package edu.sru.thangiah.zeus.gui;
 
 import com.borland.jbcl.layout.*;
+
 import edu.sru.thangiah.zeus.core.*;
+
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.tree.*;
+
 import com.brunchboy.util.swing.relativelayout.*;
+
 import java.io.File;
+
 import edu.sru.thangiah.zeus.gui.checkboxtree.*;
+import edu.sru.thangiah.zeus.top.*;
+
 import javax.swing.border.*;
 
 /**
@@ -62,7 +70,7 @@ public class RouteDisplayFrame
   private void jbInit() throws Exception {
     //this.setLayout(layout); -- Works on JBuilder 2006
      this.getContentPane().setLayout(layout);
-    rdfTrucks = createTree(ZeusGuiInfo.mainDepots);
+    rdfTrucks = createTree((TOPDepotLinkedList) ZeusGuiInfo.mainDepots);
     jSP = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, RDFPanel, rdfTrucks);
     this.getContentPane().add(jSP, "JSP");
     //this.getContentPane().add(RDFPanel, "RDFPanel");
@@ -159,10 +167,10 @@ public class RouteDisplayFrame
    * @param mainDepots depot linked list to show
    * @return the jtree
    */
-  private JCheckTree createTree(DepotLinkedList mainDepots) {
+  private JCheckTree createTree(TOPDepotLinkedList mainDepots) {
     CheckTreeNode root = new CheckTreeNode(mainDepots, true);
 
-    Depot depot = mainDepots.getHead().getNext();
+    TOPDepot depot = mainDepots.getTOPHead().getNext();
     int colorCounter = 0;
 
     while (depot != mainDepots.getTail()) {
@@ -174,21 +182,21 @@ public class RouteDisplayFrame
         }
       });
 
-      Truck truck = depot.getMainTrucks().getHead().getNext();
-
+      TOPTruck truck = depot.getMainTrucks().getHead().getTOPNext();
       while (truck != depot.getMainTrucks().getTail()) {
         CheckTreeNode tnode = new CheckTreeNode(truck, true);
         Color truckColor = new Color(Color.HSBtoRGB(
             (float) colorCounter++ / (float) mainDepots.getNumTrucksUsed(),
             1, 1));
         tnode.setColor(truckColor);
+        tnode.setSelected(truck.getIsUsed());
         tnode.setActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             RDFPanel.repaint();
           }
         });
         dnode.add(tnode);
-        truck = truck.getNext();
+        truck = truck.getTOPNext();
       }
 
       root.add(dnode);

@@ -3,6 +3,7 @@ package edu.sru.thangiah.zeus.gui;
 import javax.swing.*;
 import java.awt.*;
 import edu.sru.thangiah.zeus.core.*;
+import edu.sru.thangiah.zeus.top.*;
 
 /**
  * <p>Title: ICNN</p>
@@ -45,7 +46,7 @@ public class ZeusGuiInfo {
   public static boolean showAboutWindow = false; // By default our about window is hidden.
 
   // Labels for use in the about window.
-  public static String AboutLabel1 = "ZeusGui: A Visual Interface for the Zeus VRP Program.";
+  public static String AboutLabel1 = "ZeusGui: A Visual Interface for the Zeus TOP Program.";
   public static String AboutLabel2 = "Original Concept: Dr. Sam Thangiah";
   public static String AboutLabel3 = " ";
   public static String AboutLabel4 = "Additions/Modifications By:";

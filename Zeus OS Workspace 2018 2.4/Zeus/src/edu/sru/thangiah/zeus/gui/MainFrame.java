@@ -4,7 +4,6 @@ import com.borland.jbcl.layout.*;
 //import edu.sru.thangiah.zeus.core.OptInfo;
 import edu.sru.thangiah.zeus.core.*;
 import edu.sru.thangiah.zeus.*;
-import edu.sru.thangiah.zeus.localopts.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
@@ -283,26 +282,6 @@ public class MainFrame
      */
   }
 
-  /**
-   * Refreshes the frame with new information
-   * @param d new depot linked list
-   * @param label string describing what was just done
-   * @param optInfo information about was was jsut done
-   */
-  public void refreshIt(DepotLinkedList d, String label, edu.sru.thangiah.zeus.localopts.OptInfo optInfo) {
-    /*
-             SBVRPData.mainDepots = mainDepots = d;
-             tree = makeTree(d);
-             jScrollPane1.setViewportView(tree);
-             setLabels();
-             jLabel26.setText(new Boolean(optInfo.didChange).toString());
-             jLabel28.setText(new Integer(optInfo.numChanges).toString());
-             jLabel32.setText(new Double(SBVRPConstants.roundToDecPlaces(optInfo.costDecrease,5)).toString());
-             jLabel33.setText(new Double(SBVRPConstants.roundToDecPlaces(optInfo.distDecrease,5)).toString());
-             jLabel34.setText(new Integer(optInfo.truckDecrease).toString());
-             jLabel23.setText("Recently Run: " + label);
-     */
-  }
 
   /**
    * Macro to create the menu bar and all the menu items in it
