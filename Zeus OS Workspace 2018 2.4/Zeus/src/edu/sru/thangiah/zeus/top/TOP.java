@@ -174,9 +174,8 @@ public class TOP {
 				}
 
 				// Move the target area for the next pass
-				tempX = (float) ((targetX * Math.cos(angleBetweenPasses)) - (targetY * Math.sin(angleBetweenPasses))) - TOPProblemInfo.getStartXCoord();
+				targetX = (float) ((targetX * Math.cos(angleBetweenPasses)) - (targetY * Math.sin(angleBetweenPasses))) - TOPProblemInfo.getStartXCoord();
 				targetY = (float) ((targetX * Math.sin(angleBetweenPasses)) + (targetY * Math.cos(angleBetweenPasses))) - TOPProblemInfo.getStartYCoord();
-				targetX = tempX;
 
 				// Reset mainDepots and mainShipments for the next pass
 				mainDepots = (TOPDepotLinkedList) resetMainDepots.clone();
@@ -234,82 +233,62 @@ public class TOP {
 	 * David Crissman
 	 */
 	public OptInfo createInitialRoutes() {
-		OptInfo info = new OptInfo(); // OptInfo has old and new attributes
-		TOPDepot startDepot, endDepot; // Depot to which shipments are currently being added
-		TOPShipment currentShipment; // Shipment currently being inserted
+		OptInfo info = new OptInfo();     //OptInfo has old and new attributes
+	    TOPDepot currentDepot = null;    //Depot to which shipments are currently being added
+	    TOPShipment currentShipment = null;      //Shipment currently being inserted
 
-		// Check if selection and insertion type methods have been selected
-		if (TOPProblemInfo.getSelectShipType() == null) {
-			Settings.printDebug(Settings.ERROR, "No selection shipment type has been assigned");
+	    //Check if selection and insertion type methods have been selected
+	    if (TOPProblemInfo.getSelectShipType() == null) {
+	      Settings.printDebug(Settings.ERROR, "No selection shipment type has been assigned");
+	    }
+	    if (TOPProblemInfo.getInsertShipType() == null) {
+	      Settings.printDebug(Settings.ERROR, "No insertion shipment type has been assigned");
+	    }
+
+	    //Capture the old attributes
+	    info.setOldAttributes(mainDepots.getAttributes());
+
+	    //Assign as many shipments as possible to trucks using the primary selection algorithm
+	    //TOPProblemInfo.setSelectShipType(primarySelectType);
+	    while (mainShipments.isAllShipsAssignedOrUnreachable() == false) {
+	    	double x,y;
+	    	int i = 0;
+	    	currentDepot = mainDepots.getTOPHead().getNext();
+	    	x = currentDepot.getXCoord();
+	    	y = currentDepot.getYCoord();
+	    	
+	      TOPShipment theShipment = mainShipments.getNextInsertShipment(mainDepots, currentDepot,
+		  mainShipments, currentShipment);
+
+	      //If the shipment is null, no more shipments can be obtained using the primary algorithm
+	      if (theShipment == null) {
+	    	  Settings.printDebug(Settings.COMMENT, "No shipment was selected");
+	    	  break;
+	    	  }
+	      else {
+		//The selected shipment will be inserted into the route
+	    	  if(theShipment.getIndex() == -1) {
+	    	theShipment.setAssigned(true);
+	    }else if (!mainDepots.insertShipment(theShipment)) {
+			Settings.printDebug(Settings.COMMENT,
+				      "The Shipment: <" + theShipment.getIndex() + "> cannot be routed");
+		  theShipment.setChecked(true);
 		}
-		if (TOPProblemInfo.getInsertShipType() == null) {
-			Settings.printDebug(Settings.ERROR, "No insertion shipment type has been assigned");
+		else {
+		  Settings.printDebug(Settings.COMMENT,
+				      "The Shipment: <" + theShipment.getIndex() + "> was routed");
+		  theShipment.setAssigned(true);
 		}
+	      }
+	    }
+			//System.out.println("Loop is "+countLoop++);
+			//get the next shipment
+			//theShipment = (VRPShipment) theShipment.getNext();? - Not needed
+		
 
-		// Capture the old attributes
-		info.setOldAttributes(mainDepots.getAttributes());
-
-		// Assign as many shipments as possible to trucks using the primary selection
-		// algorithm
-		TOPProblemInfo.setSelectShipType(primarySelectType);
-		while (mainShipments.isAllShipsAssignedOrUnreachable() == false) {
-			currentShipment = mainShipments.getNextInsertShipment(mainDepots, mainDepots.getStartingDepot(),
-					mainShipments, null);
-
-			// If the shipment is null, no more shipments can be obtained using the primary
-			// algorithm
-			if (currentShipment == null) {
-				break;
-			} else {
-				// The selected shipment will be inserted into the route
-				if (!mainDepots.insertShipment(currentShipment)) {
-					Settings.printDebug(Settings.COMMENT,
-							"The Shipment: <" + currentShipment.getIndex() + "> cannot be routed");
-					currentShipment.setChecked(true);
-				} else {
-					Settings.printDebug(Settings.COMMENT,
-							"The Shipment: <" + currentShipment.getIndex() + "> was routed");
-					currentShipment.setAssigned(true);
-				}
-			}
-		}
-
-		// Clear the "checked" flags on all shipments
-		currentShipment = mainShipments.getTOPHead();
-		while (currentShipment != null) {
-			currentShipment.setChecked(false);
-			currentShipment = currentShipment.getTOPNext();
-		}
-
-		// Assign the remaining shipments to trucks using the secondary selection
-		// algorithm
-		TOPProblemInfo.setSelectShipType(secondarySelectType);
-		while (mainShipments.isAllShipsAssignedOrUnreachable() == false) {
-			currentShipment = mainShipments.getNextInsertShipment(mainDepots, mainDepots.getStartingDepot(),
-					mainShipments, null);
-
-			// If the shipment is null, print error message
-			if (currentShipment.getIndex() == -1) {
-				Settings.printDebug(Settings.COMMENT, "No shipment was selected");
-				break;
-			} else {
-				// The selected shipment will be inserted into the route
-				if (!mainDepots.insertShipment(currentShipment)) {
-					Settings.printDebug(Settings.COMMENT,
-							"The Shipment: <" + currentShipment.getIndex() + "> cannot be routed");
-				} else {
-					Settings.printDebug(Settings.COMMENT,
-							"The Shipment: <" + currentShipment.getIndex() + "> was routed");
-					currentShipment.setAssigned(true);
-				}
-			}
-
-		}
-
-		// Calculate information about the solution that was generated
-		TOPProblemInfo.getDepotLLLevelCostF().calculateTotalsStats(mainDepots);
+		ZeusProblemInfo.getDepotLLLevelCostF().calculateTotalsStats(mainDepots);
+		//ProblemInfo1.depotLLLevelCostF.calculateTotalsStats(mainDepots);
 		info.setNewAtributes(mainDepots.getAttributes());
-
 		return info;
 	}
 

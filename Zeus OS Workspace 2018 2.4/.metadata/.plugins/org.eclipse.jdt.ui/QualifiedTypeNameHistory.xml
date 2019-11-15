@@ -2,4 +2,5 @@
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.top.TOPRoot"/>
 <fullyQualifiedTypeName name="edu.sru.thangiah.zeus.core.ZeusProblemInfo"/>
+<fullyQualifiedTypeName name="edu.sru.thangiah.zeus.gui.ZeusGui"/>
 </qualifiedTypeNameHistroy>
